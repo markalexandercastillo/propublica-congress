@@ -6,10 +6,8 @@
 const http = require('./http')
   , {create, assign} = Object;
 
-const defaults = {
-  VERSION: '1',
-  HOST: 'https://api.propublica.org'
-};
+const VERSION = '1';
+const HOST = 'https://api.propublica.org';
 
 const proto = {
   /**
@@ -22,7 +20,7 @@ const proto = {
     const headers = {['X-API-Key']: this.key};
     const body = offset ? {offset} : {};
     return http.get(
-      `${this.host}/congress/v${this.version}/${endpoint}.json`,
+      `${HOST}/congress/v${VERSION}/${endpoint}.json`,
       assign({headers, json: true}, {body})
     // pluck out relevant data from the body probably from having to
     // support xml
@@ -31,22 +29,15 @@ const proto = {
 };
 
 module.exports = {
-  defaults,
   /**
    * Factory function for getting client instances
-   * @param  {options.String} [version='1']
-   * @param  {options.String} [host='https://api.propublica.org']
-   * @param  {options.String} key                                 API Key
+   * @param  {options.String} key API Key
    * @return {Object}
    */
   create({
-    version = defaults.VERSION,
-    host = defaults.HOST,
     key
   }) {
     return assign(create(proto), {
-      version,
-      host,
       key
     });
   }

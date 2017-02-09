@@ -16,43 +16,13 @@ describe('client', () => {
       "sets .key to the given 'key' option",
       () => createClient({key: 'SOME_KEY'}).key.should.equal('SOME_KEY')
     );
-
-    context('default properties', () => {
-      it(
-        "sets .version to '1'",
-        () => createClient({key: 'SOME_KEY'}).version.should.equal('1')
-      );
-
-      it(
-        "sets .host to 'https://api.propublica.org'",
-        () => createClient({key: 'SOME_KEY'}).host.should.equal('https://api.propublica.org')
-      );
-    });
-
-    it(
-      "sets .host to the given 'host' option",
-      () => createClient({
-        key: 'SOME_KEY',
-        host: 'https://somehost.org'
-      }).host.should.equal('https://somehost.org')
-    );
-
-    it(
-      "sets .version to the given 'version' option",
-      () => createClient({
-        key: 'SOME_KEY',
-        version: '2'
-      }).version.should.equal('2')
-    );
   });
 
   describe('.get()', () => {
     let client;
     beforeEach(() => {
       client = createClient({
-        key: 'SOME_KEY',
-        version: '2',
-        host: 'https://somehost.org'
+        key: 'SOME_KEY'
       });
 
       td.when(http.get(), {ignoreExtraArgs: true})
@@ -80,30 +50,20 @@ describe('client', () => {
       })));
     });
 
-    it("performs the request to .host", () => {
+    it("performs the request to the ProPublica API host", () => {
       client.get('some/endpoint');
       td.verify(http.get(
-        td.matchers.argThat(url => url.indexOf('https://somehost.org') === 0),
+        td.matchers.argThat(url => url.indexOf('https://api.propublica.org') === 0),
         td.matchers.anything()
       ));
     });
 
 
-    it("performs the request with the first path element set to 'congress'", () => {
+    it("performs the request to version 1 of ProPublica's Congres API", () => {
       client.get('some/endpoint');
       td.verify(http.get(
         td.matchers.argThat(url => {
-          return URL.parse(url).path.substr(1).split('/')[0] === 'congress';
-        }),
-        td.matchers.anything()
-      ));
-    });
-
-    it("performs the request with the first path element set to .version prefixed with 'v'", () => {
-      client.get('some/endpoint');
-      td.verify(http.get(
-        td.matchers.argThat(url => {
-          return URL.parse(url).path.substr(1).split('/')[1] === 'v2';
+          return URL.parse(url).path.indexOf('/congress/v1/') === 0;
         }),
         td.matchers.anything()
       ));
