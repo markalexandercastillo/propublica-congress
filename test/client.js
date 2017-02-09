@@ -13,23 +13,21 @@ describe('client', () => {
 
   describe('create()', () => {
     it(
-      "sets .key to the given 'key' option",
-      () => createClient({key: 'SOME_KEY'}).key.should.equal('SOME_KEY')
+      "sets .key to the given key",
+      () => createClient('SOME_KEY').key.should.equal('SOME_KEY')
     );
   });
 
   describe('.get()', () => {
     let client;
     beforeEach(() => {
-      client = createClient({
-        key: 'SOME_KEY'
-      });
+      client = createClient('SOME_KEY');
 
       td.when(http.get(), {ignoreExtraArgs: true})
         .thenResolve({body: {results: []}});
     });
 
-    it("sets the 'X-API-Key' header with the given 'key' option", () => {
+    it("sets the 'X-API-Key' header with the given key", () => {
       client.get('some/endpoint');
       td.verify(http.get(td.matchers.anything(), td.matchers.contains({
         headers: {'X-API-Key': 'SOME_KEY'}

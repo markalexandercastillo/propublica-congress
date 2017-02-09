@@ -31,12 +31,10 @@ const proto = {
 module.exports = {
   /**
    * Factory function for getting client instances
-   * @param  {options.String} key API Key
+   * @param  {String} key API Key
    * @return {Object}
    */
-  create({
-    key
-  }) {
+  create(key) {
     return assign(create(proto), {
       key
     });
