@@ -1,0 +1,16 @@
+{
+  "name": "pro-publica-congress",
+  "version": "0.0.1",
+  "description": "ProPublica Congress API client",
+  "main": "index.js",
+  "repository": {},
+  "author": "Mark Castillo",
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "^3.2.0",
+    "testdouble": "^1.11.1"
+  },
+  "dependencies": {
+    "got": "^6.7.1"
+  }
+}
