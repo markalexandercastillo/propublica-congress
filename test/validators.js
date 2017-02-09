@@ -14,8 +14,8 @@ describe('validators', () => {
       validators.isValidOffset(38).should.be.false;
     });
 
-    it('rejects 0', () => {
-      validators.isValidOffset(0).should.be.false;
+    it('accepts 0', () => {
+      validators.isValidOffset(0).should.be.true;
     });
 
     it('rejects no argument', () => validators.isValidOffset().should.be.false);

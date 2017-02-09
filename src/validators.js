@@ -3,7 +3,7 @@
  * @param {Number} offset
  */
 function isValidOffset(offset) {
-  return !!parseInt(offset) && (offset % 20) === 0;
+  return (offset % 20) === 0 && offset !== '';
 }
 
 module.exports = {
