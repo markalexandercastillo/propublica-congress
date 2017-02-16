@@ -43,7 +43,7 @@ const proto = {
 module.exports = {
   /**
    * Factory function for getting client instances
-   * @param  {String} key API Key
+   * @param  {String} key ProPublica API Key
    * @return {Object}
    */
   create(key) {
