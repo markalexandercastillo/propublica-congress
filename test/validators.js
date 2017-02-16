@@ -1,5 +1,7 @@
-const chai = require('chai');
-const validators = require('./../src/validators');
+const chai = require('chai')
+, validators = require('./../src/validators');
+
+chai.should();
 
 describe('validators', () => {
   describe('.isValidOffset()', () => {
