@@ -4,7 +4,7 @@ const chai = require('chai')
 chai.should();
 
 describe('validators', () => {
-  describe('.isValidOffset()', () => {
+  describe('isValidOffset()', () => {
     it('accepts a multiples of 20', () => {
       validators.isValidOffset(40).should.be.true;
       validators.isValidOffset(20).should.be.true;
@@ -34,7 +34,7 @@ describe('validators', () => {
     });
   });
 
-  describe('.isValidResponse()', () => {
+  describe('isValidResponse()', () => {
     it("rejects an argument that doesn't have a 'body' key", () => {
       validators.isValidResponse({}).should.be.false;
       validators.isValidResponse().should.be.false;
@@ -74,7 +74,7 @@ describe('validators', () => {
     });
   });
 
-  describe('.isValidApiKey()', () => {
+  describe('isValidApiKey()', () => {
     it('accepts a non-empty string', () => {
       validators.isValidApiKey('SOME_KEY').should.be.true;
     });
