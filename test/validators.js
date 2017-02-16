@@ -50,19 +50,10 @@ describe('validators', () => {
 
     context("invalid 'results'", () => {
       [
-        {
-          invalidResults: ['something', 'another thing'],
-          descriptorFragment: 'an array with more than one element'
-        },
-        {
-          invalidResults: [],
-          descriptorFragment: 'an empty array'
-        },
-        {
-          invalidResults: 'something',
-          descriptorFragment: 'a non-array'
-        }
-      ].forEach(({invalidResults, descriptorFragment}) => it(
+        [['something', 'another thing'], 'an array with more than one element'],
+        [[], 'an empty array'],
+        ['something', 'a non-array']
+      ].forEach(([invalidResults, descriptorFragment]) => it(
         `rejects an otherwise valid structure but with 'results' being ${descriptorFragment}`,
         () => validators.isValidResponse({body: {results: invalidResults}}).should.be.false
       ));
@@ -81,23 +72,11 @@ describe('validators', () => {
 
     context('invalid API keys', () => {
       [
-        {
-          invalidApiKey:  '',
-          descriptorFragment: 'an empty string'
-        },
-        {
-          invalidApiKey:  2,
-          descriptorFragment: 'a number'
-        },
-        {
-          invalidApiKey:  null,
-          descriptorFragment: 'a null value'
-        },
-        {
-          invalidApiKey:  {},
-          descriptorFragment: 'an object'
-        }
-      ].forEach(({invalidApiKey, descriptorFragment}) => it(
+        ['', 'an empty string'],
+        [2, 'a number'],
+        [null, 'a null value'],
+        [{}, 'an object']
+      ].forEach(([invalidApiKey, descriptorFragment]) => it(
         `rejects ${descriptorFragment}`,
         () => validators.isValidApiKey(invalidApiKey).should.be.false
       ));
