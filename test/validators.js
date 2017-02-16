@@ -73,4 +73,34 @@ describe('validators', () => {
       validators.isValidResponse({body: {results: validResults}}).should.be.true;
     });
   });
+
+  describe('.isValidApiKey()', () => {
+    it('accepts a non-empty string', () => {
+      validators.isValidApiKey('SOME_KEY').should.be.true;
+    });
+
+    context('invalid API keys', () => {
+      [
+        {
+          invalidApiKey:  '',
+          descriptorFragment: 'an empty string'
+        },
+        {
+          invalidApiKey:  2,
+          descriptorFragment: 'a number'
+        },
+        {
+          invalidApiKey:  null,
+          descriptorFragment: 'a null value'
+        },
+        {
+          invalidApiKey:  {},
+          descriptorFragment: 'an object'
+        }
+      ].forEach(({invalidApiKey, descriptorFragment}) => it(
+        `rejects ${descriptorFragment}`,
+        () => validators.isValidApiKey(invalidApiKey).should.be.false
+      ));
+    });
+  });
 });

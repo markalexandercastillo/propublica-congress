@@ -20,7 +20,18 @@ function isValidResponse(response) {
     && response.body.results.length === 1;
 }
 
+/**
+ * Whether the API key is valid (for trying to use)
+ * @param  {String}  apiKey
+ * @return {Boolean}
+ */
+function isValidApiKey(apiKey) {
+  return (typeof apiKey === 'string' || apiKey instanceof String)
+    && apiKey.length > 0;
+}
+
 module.exports = {
   isValidOffset,
-  isValidResponse
+  isValidResponse,
+  isValidApiKey
 };
