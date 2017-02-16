@@ -48,16 +48,14 @@ describe('validators', () => {
       validators.isValidResponse({body: 'something'}).should.be.false;
     });
 
-    context("invalid 'results'", () => {
-      [
-        [['something', 'another thing'], 'an array with more than one element'],
-        [[], 'an empty array'],
-        ['something', 'a non-array']
-      ].forEach(([invalidResults, descriptorFragment]) => it(
-        `rejects an otherwise valid structure but with 'results' being ${descriptorFragment}`,
-        () => validators.isValidResponse({body: {results: invalidResults}}).should.be.false
-      ));
-    });
+    context("invalid 'results'", () => [
+      [['something', 'another thing'], 'an array with more than one element'],
+      [[], 'an empty array'],
+      ['something', 'a non-array']
+    ].forEach(([invalidResults, descriptorFragment]) => it(
+      `rejects an otherwise valid structure but with 'results' being ${descriptorFragment}`,
+      () => validators.isValidResponse({body: {results: invalidResults}}).should.be.false
+    )));
 
     it("accepts an argument with a key of 'body' which has an object with a key of 'results' which is a single-element array", () => {
       const validResults = ['something'];
@@ -70,16 +68,14 @@ describe('validators', () => {
       validators.isValidApiKey('SOME_KEY').should.be.true;
     });
 
-    context('invalid API keys', () => {
-      [
-        ['', 'an empty string'],
-        [2, 'a number'],
-        [null, 'a null value'],
-        [{}, 'an object']
-      ].forEach(([invalidApiKey, descriptorFragment]) => it(
-        `rejects ${descriptorFragment}`,
-        () => validators.isValidApiKey(invalidApiKey).should.be.false
-      ));
-    });
+    context('invalid API keys', () => [
+      ['', 'an empty string'],
+      [2, 'a number'],
+      [null, 'a null value'],
+      [{}, 'an object']
+    ].forEach(([invalidApiKey, descriptorFragment]) => it(
+      `rejects ${descriptorFragment}`,
+      () => validators.isValidApiKey(invalidApiKey).should.be.false
+    )));
   });
 });
