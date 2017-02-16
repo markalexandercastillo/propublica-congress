@@ -7,6 +7,20 @@ function isValidOffset(offset) {
   return (offset % 20) === 0 && offset !== '';
 }
 
+/**
+ * Whether the given response data has a valid structure
+ * @param  {Object}  response
+ * @return {Boolean}
+ */
+function isValidResponse(response) {
+  return !!response
+    && !!response.body
+    && !!response.body.results
+    && Array.isArray(response.body.results)
+    && response.body.results.length === 1;
+}
+
 module.exports = {
-  isValidOffset
+  isValidOffset,
+  isValidResponse
 };

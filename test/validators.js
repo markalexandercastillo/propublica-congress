@@ -31,4 +31,44 @@ describe('validators', () => {
       validators.isValidOffset('100').should.be.true;
     });
   });
+
+  describe('.isValidResponse()', () => {
+    it("rejects an argument that doesn't have a 'body' key", () => {
+      validators.isValidResponse({}).should.be.false;
+      validators.isValidResponse().should.be.false;
+      validators.isValidResponse(null).should.be.false;
+      validators.isValidResponse('something').should.be.false;
+    });
+
+    it("rejects an argument that doesn't have a results key nested in it's 'body'", () => {
+      validators.isValidResponse({body: {}}).should.be.false;
+      validators.isValidResponse({body: null}).should.be.false;
+      validators.isValidResponse({body: 'something'}).should.be.false;
+    });
+
+    context("invalid 'results'", () => {
+      [
+        {
+          invalidResults: ['something', 'another thing'],
+          descriptorFragment: 'an array with more than one element'
+        },
+        {
+          invalidResults: [],
+          descriptorFragment: 'an empty array'
+        },
+        {
+          invalidResults: 'something',
+          descriptorFragment: 'a non-array'
+        }
+      ].forEach(({invalidResults, descriptorFragment}) => it(
+        `rejects an otherwise valid structure but with 'results' being ${descriptorFragment}`,
+        () => validators.isValidResponse({body: {results: invalidResults}}).should.be.false
+      ));
+    });
+
+    it("accepts an object with a key of 'body' which has an object with a key of 'results' which is a single-element array", () => {
+      const validResults = ['something'];
+      validators.isValidResponse({body: {results: validResults}}).should.be.true;
+    });
+  });
 });
