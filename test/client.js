@@ -16,6 +16,11 @@ describe('client', () => {
       "sets .key to the given key",
       () => createClient('SOME_KEY').key.should.equal('SOME_KEY')
     );
+
+    it(
+      'throws with an invalid key',
+      () => (() => createClient()).should.throw(Error, 'Received invalid API key:')
+    );
   });
 
   describe('.get()', () => {
@@ -81,7 +86,18 @@ describe('client', () => {
       td.when(http.get(), {ignoreExtraArgs: true})
         .thenResolve({body: {results: ['relevantData']}});
 
-      client.get('some/endpint').should.eventually.equal('relevantData');
+      client.get('some/endpint').should.become('relevantData');
+    });
+
+    it("rejects if the response came back with an invalid response structure", () => {
+      td.when(http.get(), {ignoreExtraArgs: true})
+        .thenResolve('invalid response structure');
+
+      client.get('some/endpoint').should.be.rejectedWith(Error, 'Received invalid response structure:');
+    });
+
+    it('rejects if given an invalid offset value', () => {
+      client.get('some/endpoint', 'an invalid offset').should.be.rejectedWith(Error, 'Received invalid offset:');
     });
   });
 });

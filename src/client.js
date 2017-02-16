@@ -3,8 +3,10 @@
  * common to all API interactions.
  */
 
-const http = require('./http')
-  , {create, assign} = Object;
+const {create, assign} = Object
+  , {stringify} = JSON
+  , http = require('./http')
+  , validators = require('./validators');
 
 const VERSION = '1';
 const HOST = 'https://api.propublica.org';
@@ -17,6 +19,10 @@ const proto = {
    * @return {Promise}
    */
   get(endpoint, offset = 0) {
+    if (!validators.isValidOffset(offset)) {
+      return Promise.reject(new Error(`Received invalid offset: ${stringify(offset)}`));
+    }
+
     const headers = {['X-API-Key']: this.key};
     const body = offset ? {offset} : {};
     return http.get(
@@ -24,7 +30,13 @@ const proto = {
       assign({headers, json: true}, {body})
     // pluck out relevant data from the body probably from having to
     // support xml
-    ).then(response => response.body.results[0]);
+    ).then(response => {
+      if (!validators.isValidResponse(response)) {
+        throw new Error(`Received invalid response structure: ${stringify(response)}`);
+      }
+
+      return response.body.results[0];
+    });
   }
 };
 
@@ -35,6 +47,10 @@ module.exports = {
    * @return {Object}
    */
   create(key) {
+    if (!validators.isValidApiKey(key)) {
+      throw Error(`Received invalid API key: ${stringify(key)}`);
+    }
+
     return assign(create(proto), {
       key
     });
