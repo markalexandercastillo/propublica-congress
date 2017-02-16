@@ -66,7 +66,7 @@ describe('validators', () => {
       ));
     });
 
-    it("accepts an object with a key of 'body' which has an object with a key of 'results' which is a single-element array", () => {
+    it("accepts an argument with a key of 'body' which has an object with a key of 'results' which is a single-element array", () => {
       const validResults = ['something'];
       validators.isValidResponse({body: {results: validResults}}).should.be.true;
     });
