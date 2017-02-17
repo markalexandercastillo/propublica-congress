@@ -21,6 +21,19 @@ function isValidResponse(response) {
 }
 
 /**
+ * Whether the given type is in the given typeMap
+ * @param  {String}  type
+ * @param  {Object}  [typeMap={}] Expected to be an object with const-style
+ *                                keys (capital, underscored)
+ * @return {Boolean}
+ */
+function isValidType(type, typeMap = {}) {
+  return (typeof type === 'string' || type instanceof String)
+    && !!Object.keys(typeMap).length
+    && !!typeMap[type.toUpperCase()];
+}
+
+/**
  * Whether the API key is valid (for trying to use)
  * @param  {String}  apiKey
  * @return {Boolean}
@@ -31,6 +44,7 @@ function isValidApiKey(apiKey) {
 }
 
 module.exports = {
+  isValidType,
   isValidOffset,
   isValidResponse,
   isValidApiKey
