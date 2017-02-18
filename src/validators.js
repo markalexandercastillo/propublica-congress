@@ -1,4 +1,9 @@
 /**
+ * Exports validation utility functions used throughout this library. They're primarily intended
+ * for minimizing unnecessary API calls
+ */
+
+/**
  * Whether the argument is a valid offset to send to the ProPublica API
  * @param {String|Number} offset
  * @return {Boolean}
