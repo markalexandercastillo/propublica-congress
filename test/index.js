@@ -1,11 +1,14 @@
-const {replace, when, matchers: {anything}} = require('testdouble');
+const {replace, when, verify, object, matchers: {
+  anything,
+  argThat
+}} = require('testdouble');
 
 require('chai').use(require('chai-as-promised')).should();
 
 describe('pro-publica-congress', () => {
-  let client, validators, createPpc;
+  let clientModule, validators, createPpc;
   beforeEach(() => {
-    client = replace('./../src/client');
+    clientModule = replace('./../src/client');
     validators = replace('./../src/validators');
     createPpc = require('./../src/index').create;
     when(validators.isValidCongress(anything())).thenReturn(true);
@@ -21,8 +24,54 @@ describe('pro-publica-congress', () => {
 
     it("sets a 'client' property to a client created with the given key argument", () => {
       const expectedClient = {};
-      when(client.create('SOME_KEY')).thenReturn(expectedClient);
+      when(clientModule.create('SOME_KEY')).thenReturn(expectedClient);
       createPpc('SOME_KEY', 115).client.should.equal(expectedClient);
+    });
+  });
+
+  describe('instance methods', () => {
+    let ppc, client;
+    beforeEach(() => {
+      client = object(['get']);
+      when(clientModule.create(anything())).thenReturn(client);
+      ppc = createPpc('SOME_KEY', 115);
+    });
+
+    describe('.getRecentBills()', () => {
+      it('sets the default congress as the first element of the endpoint', () => {
+        ppc.getRecentBills('some_chamber', 'some_recent_bill_type');
+        verify(client.get(argThat(endpoint => endpoint.split('/')[0] === '115'), anything()));
+      });
+
+      it('sets the given congress as the first element of the endpoint', () => {
+        ppc.getRecentBills('some_chamber', 'some_recent_bill_type', {congress: 114});
+        verify(client.get(argThat(endpoint => endpoint.split('/')[0] === '114'), anything()));
+      });
+
+      it('sets the given chamber as the second element of the endpoint', () => {
+        ppc.getRecentBills('some_chamber', 'some_recent_bill_type');
+        verify(client.get(argThat(endpoint => endpoint.split('/')[1] === 'some_chamber'), anything()));
+      });
+
+      it("sets 'bills' as the third element of the endpoint", () => {
+        ppc.getRecentBills('some_chamber', 'some_recent_bill_type');
+        verify(client.get(argThat(endpoint => endpoint.split('/')[2] === 'bills'), anything()));
+      });
+
+      it('sets the given recent bill type as the fourth element of the endpoint', () => {
+        ppc.getRecentBills('some_chamber', 'some_recent_bill_type');
+        verify(client.get(argThat(endpoint => endpoint.split('/')[3] === 'some_recent_bill_type'), anything()));
+      });
+
+      it('sets the offset to 0 by default', () => {
+        ppc.getRecentBills('some_chamber', 'some_recent_bill_type');
+        verify(client.get(anything(), 0));
+      });
+
+      it('sets the given offset', () => {
+        ppc.getRecentBills('some_chamber', 'some_recent_bill_type', {offset: 20});
+        verify(client.get(anything(), 20));
+      });
     });
   });
 });

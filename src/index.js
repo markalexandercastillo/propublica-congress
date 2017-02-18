@@ -5,6 +5,10 @@ const {create, assign} = Object
   ;
 
 const proto = {
+  getRecentBills(chamber, recentBillType, {congress = this.congress, offset = 0} = {}) {
+    const endpoint = `${congress}/${chamber}/bills/${recentBillType}`;
+    return this.client.get(endpoint, offset);
+  }
 };
 
 module.exports = {
