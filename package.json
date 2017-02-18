@@ -9,6 +9,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
+    "eslint": "^3.15.0",
     "locus": "^1.2.0",
     "mocha": "^3.2.0",
     "testdouble": "^1.11.1"
