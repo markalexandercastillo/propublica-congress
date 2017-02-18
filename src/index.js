@@ -11,13 +11,35 @@ const recentBillTypes = new Set([
   'major'
 ]);
 
+function isValidChamber(chamber) {
+  return new Promise((resolve, reject) => validators.isValidChamber(chamber)
+    ? resolve(true)
+    : reject(new Error(`Received invalid chamber: ${stringify(chamber)}`))
+  );
+}
+
+function isValidCongress(session, earliestSession) {
+  return new Promise((resolve, reject) => validators.isValidCongress(session, earliestSession)
+    ? resolve(true)
+    : reject(new Error(`Received invalid congress: ${stringify(session)}`))
+  );
+}
+
+function isValidType(type, typeSet, descriptor) {
+  return new Promise((resolve, reject) => validators.isValidType(type, typeSet)
+    ? resolve(true)
+    : reject(new Error(`Received invalid ${descriptor}: ${stringify(type)}`))
+  );
+}
+
 const proto = {
   getRecentBills(chamber, recentBillType, {congress = this.congress, offset = 0} = {}) {
-    if (!validators.isValidChamber(chamber)) return Promise.reject(new Error(`Received invalid chamber: ${stringify(chamber)}`));
-    if (!validators.isValidCongress(congress, 105)) return Promise.reject(new Error(`Received invalid congress: ${stringify(congress)}`));
-    if (!validators.isValidType(recentBillType, recentBillTypes)) return Promise.reject(new Error(`Received invalid recent bill type: ${stringify(recentBillType)}`));
     const endpoint = `${congress}/${chamber}/bills/${recentBillType}`;
-    return this.client.get(endpoint, offset);
+    return Promise.all([
+      isValidChamber(chamber),
+      isValidCongress(congress, 105),
+      isValidType(recentBillType, recentBillTypes)
+    ]).then(() => this.client.get(endpoint, offset));
   }
 };
 
