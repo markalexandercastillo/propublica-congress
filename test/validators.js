@@ -88,4 +88,18 @@ describe('validators', () => {
       validators.isValidType('another_type', new Set(['some_type'])).should.be.false;
     });
   });
+
+  describe('isValidChamber()', () => {
+    ['senate', 'house'].forEach((validChamber) => it(
+      `accepts '${validChamber}'`,
+      () => validators.isValidChamber(validChamber).should.be.true
+    ));
+    
+    it('rejects anything else', () => {
+      validators.isValidChamber('').should.be.false;
+      validators.isValidChamber().should.be.false;
+      validators.isValidChamber(null).should.be.false;
+      validators.isValidChamber({}).should.be.false;
+    });
+  });
 });

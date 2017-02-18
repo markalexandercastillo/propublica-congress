@@ -32,6 +32,20 @@ function isValidType(type, typeSet = new Set([])) {
     && typeSet.has(type);
 }
 
+const chamberTypes = new Set([
+  'senate',
+  'house'
+]);
+
+/**
+ * Whether the given string is a valid chamber of congress
+ * @param  {String}  chamber
+ * @return {Boolean}
+ */
+function isValidChamber(chamber) {
+  return isValidType(chamber, chamberTypes);
+}
+
 /**
  * Whether the API key is valid (for trying to use)
  * @param  {String}  apiKey
@@ -43,6 +57,7 @@ function isValidApiKey(apiKey) {
 }
 
 module.exports = {
+  isValidChamber,
   isValidType,
   isValidOffset,
   isValidResponse,
