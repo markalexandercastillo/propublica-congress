@@ -5,6 +5,8 @@ const {replace, when, verify, object, matchers: {
 
 require('chai').use(require('chai-as-promised')).should();
 
+const ignoreExtraArgs = true;
+
 describe('pro-publica-congress', () => {
   let clientModule, validators, createPpc;
   beforeEach(() => {
@@ -13,9 +15,9 @@ describe('pro-publica-congress', () => {
     createPpc = require('./../src/index').create;
 
     // validation invocations pass by default
-    when(validators.isValidCongress(anything())).thenReturn(true);
-    when(validators.isValidChamber(anything())).thenReturn(true);
-    when(validators.isValidType(anything(), anything())).thenReturn(true);
+    when(validators.isValidCongress(), {ignoreExtraArgs}).thenReturn(true);
+    when(validators.isValidChamber(), {ignoreExtraArgs}).thenReturn(true);
+    when(validators.isValidType(), {ignoreExtraArgs}).thenReturn(true);
   });
 
   describe('create()', () => {
@@ -83,8 +85,13 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid congress', () => {
-        when(validators.isValidCongress(114)).thenReturn(false);
+        when(validators.isValidCongress(114), {ignoreExtraArgs}).thenReturn(false);
         ppc.getRecentBills('some_chamber', 'some_recent_bill_type', {congress: 114}).should.be.rejectedWith(Error, 'Received invalid congress:');
+      });
+
+      it('validates against the 105th congress as the earliest', () => {
+        ppc.getRecentBills('some_chamber', 'some_recent_bill_type');
+        verify(validators.isValidCongress(anything(), 105));
       });
 
       it('validates against recent bill types', () => {
