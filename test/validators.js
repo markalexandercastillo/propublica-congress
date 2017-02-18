@@ -81,11 +81,11 @@ describe('validators', () => {
 
   describe('isValidType()', () => {
     it("accepts a type if it's in the map", () => {
-      validators.isValidType('some_type', {SOME_TYPE: 'some_type'}).should.be.true;
+      validators.isValidType('some_type', new Set(['some_type'])).should.be.true;
     });
 
     it("rejects a type if it's not in the map", () => {
-      validators.isValidType('another_type', {SOME_TYPE: 'some_type'}).should.be.false;
+      validators.isValidType('another_type', new Set(['some_type'])).should.be.false;
     });
   });
 });

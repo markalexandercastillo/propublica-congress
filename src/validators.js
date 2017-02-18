@@ -21,16 +21,15 @@ function isValidResponse(response) {
 }
 
 /**
- * Whether the given type is in the given typeMap
+ * Whether the given type is in the given typeSet
  * @param  {String}  type
- * @param  {Object}  [typeMap={}] Expected to be an object with const-style
- *                                keys (capital, underscored)
+ * @param  {Set}     [typeSet={}] A Set of types to validate against
  * @return {Boolean}
  */
-function isValidType(type, typeMap = {}) {
+function isValidType(type, typeSet = new Set([])) {
   return (typeof type === 'string' || type instanceof String)
-    && !!Object.keys(typeMap).length
-    && !!typeMap[type.toUpperCase()];
+    && !!type.length
+    && typeSet.has(type);
 }
 
 /**
