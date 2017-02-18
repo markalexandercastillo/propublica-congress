@@ -2,7 +2,6 @@
   "name": "pro-publica-congress",
   "version": "0.0.1",
   "description": "ProPublica Congress API client",
-  "main": "index.js",
   "repository": {},
   "author": "Mark Castillo",
   "license": "MIT",
