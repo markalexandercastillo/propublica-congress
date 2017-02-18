@@ -11,7 +11,11 @@ describe('pro-publica-congress', () => {
     clientModule = replace('./../src/client');
     validators = replace('./../src/validators');
     createPpc = require('./../src/index').create;
+
+    // validation invocations pass by default
     when(validators.isValidCongress(anything())).thenReturn(true);
+    when(validators.isValidChamber(anything())).thenReturn(true);
+    when(validators.isValidType(anything(), anything())).thenReturn(true);
   });
 
   describe('create()', () => {
@@ -71,6 +75,31 @@ describe('pro-publica-congress', () => {
       it('sets the given offset', () => {
         ppc.getRecentBills('some_chamber', 'some_recent_bill_type', {offset: 20});
         verify(client.get(anything(), 20));
+      });
+
+      it('rejects with an invalid chamber', () => {
+        when(validators.isValidChamber('some_chamber')).thenReturn(false);
+        ppc.getRecentBills('some_chamber', 'some_recent_bill_type').should.be.rejectedWith(Error, 'Received invalid chamber:');
+      });
+
+      it('rejects with an invalid congress', () => {
+        when(validators.isValidCongress(114)).thenReturn(false);
+        ppc.getRecentBills('some_chamber', 'some_recent_bill_type', {congress: 114}).should.be.rejectedWith(Error, 'Received invalid congress:');
+      });
+
+      it('validates against recent bill types', () => {
+        ppc.getRecentBills('some_chamber', 'some_recent_bill_type');
+        verify(validators.isValidType('some_recent_bill_type', new Set([
+          'introduced',
+          'updated',
+          'passed',
+          'major'
+        ])));
+      });
+
+      it('rejects with an invalid recent bill type', () => {
+        when(validators.isValidType('some_recent_bill_type', anything())).thenReturn(false);
+        ppc.getRecentBills('some_chamber', 'some_recent_bill_type').should.be.rejectedWith(Error, 'Received invalid recent bill type:');
       });
     });
   });
