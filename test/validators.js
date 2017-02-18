@@ -102,4 +102,40 @@ describe('validators', () => {
       validators.isValidChamber({}).should.be.false;
     });
   });
+
+  describe('isValidCongress()', () => {
+    context('without a lower limit', () => {
+      it('accepts the current session and lower', () => {
+        validators.isValidCongress(115).should.be.true;
+        validators.isValidCongress(100).should.be.true;
+      });
+
+      it('rejects any sessions past the current congress', () => {
+        validators.isValidCongress(116).should.be.false;
+        validators.isValidCongress(200).should.be.false;
+      });
+
+      it('rejects non-numeric values', () => {
+        validators.isValidCongress(null).should.be.false;
+        validators.isValidCongress().should.be.false;
+        validators.isValidCongress('an invalid session').should.be.false;
+        validators.isValidCongress({}).should.be.false;
+      });
+    });
+
+    context('with a lower limit', () => {
+      it('rejects any sessions past the current congress', () => {
+        validators.isValidCongress(116, 108).should.be.false;
+        validators.isValidCongress(200, 108).should.be.false;
+      });
+
+      it('rejects sessions before the lower limit', () => {
+        validators.isValidCongress(101, 108).should.be.false;
+      });
+
+      it('accepts a session after and including the lower limit', () => {
+        validators.isValidCongress(108, 108).should.be.true;
+      });
+    });
+  });
 });

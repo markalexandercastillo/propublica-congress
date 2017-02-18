@@ -46,6 +46,23 @@ function isValidChamber(chamber) {
   return isValidType(chamber, chamberTypes);
 }
 
+const CURRENT_SESSION = 115;
+
+/**
+ * Whether the given session of congress is valid
+ * @param  {Number}  session
+ * @param  {Number}  earliestSession Different endpoints support different
+ *                                   lower limits
+ * @return {Boolean}
+ */
+function isValidCongress(session, earliestSession) {
+  if (parseInt(session) != session) return false;
+  if (earliestSession && parseInt(earliestSession) != earliestSession) return false;
+  return earliestSession
+    ? session <= CURRENT_SESSION && session >= earliestSession
+    : session <= CURRENT_SESSION;
+}
+
 /**
  * Whether the API key is valid (for trying to use)
  * @param  {String}  apiKey
@@ -57,6 +74,7 @@ function isValidApiKey(apiKey) {
 }
 
 module.exports = {
+  isValidCongress,
   isValidChamber,
   isValidType,
   isValidOffset,
