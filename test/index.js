@@ -318,6 +318,92 @@ describe('pro-publica-congress', () => {
           )));
       });
     });
+    
+    describe('getMemberList()', () => {
+      it('sets the default congress as the first element of the endpoint', () => {
+        return ppc.getMemberList('some_chamber')
+          .then(() => ignoringVerify(client.get(
+            argThat(endpoint => endpoint.split('/')[0] === '115')
+          )));
+      });
+
+      it('sets the given congress as the first element of the endpoint', () => {
+        return ppc.getMemberList('some_chamber', {congress: 114})
+          .then(() => ignoringVerify(client.get(
+            argThat(endpoint => endpoint.split('/')[0] === '114')
+          )));
+      });
+
+      it('sets the given chamber as the second element of the endpoint', () => {
+        return ppc.getMemberList('some_chamber')
+          .then(() => ignoringVerify(client.get(
+            argThat(endpoint => endpoint.split('/')[1] === 'some_chamber')
+          )));
+      });
+
+      it("sets 'members' as the third element of the endpoint", () => {
+        return ppc.getMemberList('some_chamber')
+          .then(() => ignoringVerify(client.get(
+            argThat(endpoint => endpoint.split('/')[2] === 'members')
+          )));
+      });
+
+      it('sets the offset to 0 by default', () => {
+        return ppc.getMemberList('some_chamber')
+          .then(() => verify(client.get(
+            anything(),
+            0
+          )));
+      });
+
+      it('sets the given offset', () => {
+        return ppc.getMemberList('some_chamber', {offset: 20})
+          .then(() => verify(client.get(
+            anything(),
+            20
+          )));
+      });
+
+      it('rejects with an invalid chamber', () => {
+        when(validators.isValidChamber('some_chamber'))
+          .thenReturn(false);
+
+        return ppc.getMemberList('some_chamber')
+          .should.be.rejectedWith(Error, 'Received invalid chamber:');
+      });
+
+      it('validates against the 102nd congress as the earliest for the house', () => {
+        return ppc.getMemberList('house')
+          .then(() => verify(validators.isValidCongress(
+            anything(),
+            102
+          )));
+      });
+
+      it('reject on house lists before the 102nd congress', () => {
+        when(validators.isValidCongress(100, 102))
+          .thenReturn(false);
+
+        return ppc.getMemberList('house', {congress: 100})
+          .should.be.rejectedWith(Error, 'Received invalid congress:');
+      });
+
+      it('reject on senate lists before the 80th congress', () => {
+        when(validators.isValidCongress(70, 80))
+          .thenReturn(false);
+
+        return ppc.getMemberList('senate', {congress: 70})
+          .should.be.rejectedWith(Error, 'Received invalid congress:');
+      });
+
+      it('validates against the 80th congress as the earliest for the senate', () => {
+        return ppc.getMemberList('senate')
+          .then(() => verify(validators.isValidCongress(
+            anything(),
+            80
+          )));
+      });
+    });
   });
 });
 

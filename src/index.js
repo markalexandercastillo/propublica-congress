@@ -48,6 +48,21 @@ function validateBillId(billId) {
 
 const proto = {
   /**
+   * Resolves to a list of members of a particular chamber in a particular Congress.
+   * 
+   * @see https://propublica.github.io/congress-api-docs/#lists-of-members
+   * @param {String} chamber 'senate' or 'house'
+   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @returns {Promise}
+   */
+  getMemberList(chamber, {congress = this.congress, offset = 0} = {}) {
+    return validateChamber(chamber)
+      .then(() => validateCongress(congress, {
+        senate: 80,
+        house: 102}[chamber])
+      ).then(() => this.client.get(`${congress}/${chamber}/members`, offset));
+  },
+  /**
    * Resolves to additional details about a particular bill of the given type.
    * 
    * @see https://propublica.github.io/congress-api-docs/#get-a-subjects-amendments-and-related-bills-for-a-specific-bill
