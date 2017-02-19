@@ -94,7 +94,7 @@ const proto = {
    */
   getVotesByMember(memberId, {offset = 0} = {}) {
     return validateMemberId(memberId)
-      .then(() => this.client.get(`members/${memberId}`, offset));
+      .then(() => this.client.get(`members/${memberId}/votes`, offset));
   },
   /**
    * Resolves to a list of the most recent new members of the current Congress.
