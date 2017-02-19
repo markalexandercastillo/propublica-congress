@@ -481,104 +481,99 @@ describe('pro-publica-congress', () => {
     });
 
     describe('.getMemberComparison()', () => {
-      it("sets 'members' as the first element of the endpoint", () => {
+      /**
+       * Helper to minimize repeating this multi-line invocation. Wraps around the call to 
+       * ppc.getMemberComparison using an options hash whose keys map to the arguments of the method
+       * the required parameters have default values set which may or may not be referenced in a
+       * test. They may also be overridden for the purposes of the test.
+       * 
+       * @param {Object} [{
+       *         firstMemberId = 'some_member_id',
+       *         secondMemberId = 'some_other_member_id',
+       *         chamber = 'some_chamber',
+       *         memberComparisonType = 'some_member_comparison_type',
+       *         congress,
+       *         offset
+       *       }={}] 
+       * @returns 
+       */
+      function getMemberComparison({
+        firstMemberId = 'some_member_id',
+        secondMemberId = 'some_other_member_id',
+        chamber = 'some_chamber',
+        memberComparisonType = 'some_member_comparison_type',
+        congress,
+        offset
+      } = {}) {
         return ppc.getMemberComparison(
-         'some_member_id',
-          'some_other_member_id',
-          'some_chamber',
-          'some_member_comparison_type'
-        ).then(() => ignoringVerify(client.get(
+          firstMemberId,
+          secondMemberId,
+          chamber,
+          memberComparisonType,
+          Object.assign({}, congress ? {congress} : {}, offset ? {offset} : {})
+        );
+      }
+
+      it("sets 'members' as the first element of the endpoint", () => {
+        return getMemberComparison()
+          .then(() => ignoringVerify(client.get(
           argThat(endpoint => endpoint.split('/')[0] === 'members')
         )));
       });
 
       it("sets the given first member ID as the second element of the endpoint", () => {
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'some_chamber',
-          'some_member_comparison_type'
-        ).then(() => ignoringVerify(client.get(
+        return getMemberComparison()
+          .then(() => ignoringVerify(client.get(
           argThat(endpoint => endpoint.split('/')[1] === 'some_member_id')
         )));
       });
 
       it("sets the given comparison type as the third element of the endpoint", () => {
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'some_chamber',
-          'some_member_comparison_type'
-        ).then(() => ignoringVerify(client.get(
+        return getMemberComparison()
+          .then(() => ignoringVerify(client.get(
           argThat(endpoint => endpoint.split('/')[2] === 'some_member_comparison_type')
         )));
       });
 
       it("sets the given second member ID as the fourth element of the endpoint", () => {
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'some_chamber',
-          'some_member_comparison_type'
-        ).then(() => ignoringVerify(client.get(
+        return getMemberComparison()
+          .then(() => ignoringVerify(client.get(
           argThat(endpoint => endpoint.split('/')[3] === 'some_other_member_id')
         )));
       });
 
       it("sets the default congress as the fifth element of the endpoint", () => {
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'some_chamber',
-          'some_member_comparison_type'
-        ).then(() => ignoringVerify(client.get(
+        return getMemberComparison()
+          .then(() => ignoringVerify(client.get(
           argThat(endpoint => endpoint.split('/')[4] === '115')
         )));
       });
 
       it("sets the given congress as the fifth element of the endpoint", () => {
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'some_chamber',
-          'some_member_comparison_type',
-          {congress: 114}
-        ).then(() => ignoringVerify(client.get(
+        return getMemberComparison({congress: 114})
+          .then(() => ignoringVerify(client.get(
           argThat(endpoint => endpoint.split('/')[4] === '114')
         )));
       });
 
       it("sets the given chamber as the sixth element of the endpoint", () => {
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'some_chamber',
-          'some_member_comparison_type'
-        ).then(() => ignoringVerify(client.get(
+        return getMemberComparison()
+          .then(() => ignoringVerify(client.get(
           argThat(endpoint => endpoint.split('/')[5] === 'some_chamber')
         )));
       });
 
       it('sets the offset to 0 by default', () => {
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'some_chamber',
-          'some_member_comparison_type'
-        ).then(() => verify(client.get(
+        return getMemberComparison()
+          .then(() => verify(client.get(
             anything(),
             0
           )));
       });
 
       it('sets the given offset', () => {
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'some_chamber',
-          'some_member_comparison_type',
-          {offset: 20}
-        ).then(() => verify(client.get(
+        return getMemberComparison({offset: 20})
+          .then(() => verify(client.get(
             anything(),
             20
           )));
@@ -588,45 +583,37 @@ describe('pro-publica-congress', () => {
         when(validators.isValidMemberId('some_member_id'))
           .thenReturn(false);
 
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'some_chamber',
-          'some_member_comparison_type'
-        ).should.be.rejectedWith(Error, 'Received invalid member ID:');
+        return getMemberComparison()
+          .should.be.rejectedWith(Error, 'Received invalid member ID:');
       });
 
       it('rejects with an invalid second member ID', () => {
         when(validators.isValidMemberId('some_other_member_id'))
           .thenReturn(false);
 
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'some_chamber',
-          'some_member_comparison_type'
-        ).should.be.rejectedWith(Error, 'Received invalid member ID:');
+        return getMemberComparison()
+          .should.be.rejectedWith(Error, 'Received invalid member ID:');
       });
 
       it('rejects with an invalid chamber', () => {
         when(validators.isValidChamber('some_chamber'))
           .thenReturn(false);
 
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'some_chamber',
-          'some_member_comparison_type'
-        ).should.be.rejectedWith(Error, 'Received invalid chamber:');
+        return getMemberComparison()
+          .should.be.rejectedWith(Error, 'Received invalid chamber:');
+      });
+
+      it('validates against the 101st congress as the earliest for the senate', () => {
+        return getMemberComparison({chamber: 'senate'})
+          .then(() => verify(validators.isValidCongress(
+            anything(),
+            101
+          )));
       });
 
       it('validates against the 102nd congress as the earliest for the house', () => {
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'house',
-          'some_member_comparison_type'
-        ).then(() => verify(validators.isValidCongress(
+        return getMemberComparison({chamber: 'house'})
+          .then(() => verify(validators.isValidCongress(
             anything(),
             102
           )));
@@ -636,38 +623,16 @@ describe('pro-publica-congress', () => {
         when(validators.isValidCongress(100, 102))
           .thenReturn(false);
 
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'house',
-          'some_member_comparison_type',
-          {congress: 100}
-        ).should.be.rejectedWith(Error, 'Received invalid congress:');
+        return getMemberComparison({chamber: 'house', congress: 100})
+          .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
 
       it('rejects with senator comparisons before the 101st congress', () => {
         when(validators.isValidCongress(70, 101))
           .thenReturn(false);
 
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'senate',
-          'some_member_comparison_type',
-          {congress: 70}
-        ).should.be.rejectedWith(Error, 'Received invalid congress:');
-      });
-
-      it('validates against the 101st congress as the earliest for the senate', () => {
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'senate',
-          'some_member_comparison_type'
-        ).then(() => verify(validators.isValidCongress(
-            anything(),
-            101
-          )));
+        return getMemberComparison({chamber: 'senate', congress: 70})
+          .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
 
       it('validates against member comparison types', () => {
@@ -675,12 +640,8 @@ describe('pro-publica-congress', () => {
           'bills',
           'votes',
         ]);
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'some_chamber',
-          'some_member_comparison_type'
-        ).then(() => verify(validators.isValidType(
+        return getMemberComparison()
+          .then(() => verify(validators.isValidType(
             'some_member_comparison_type',
             expectedTypeSet
           )));
@@ -690,12 +651,8 @@ describe('pro-publica-congress', () => {
         ignoringWhen(validators.isValidType('some_member_comparison_type'))
           .thenReturn(false);
 
-        return ppc.getMemberComparison(
-          'some_member_id',
-          'some_other_member_id',
-          'some_chamber',
-          'some_member_comparison_type'
-        ).should.be.rejectedWith(Error, 'Received invalid member comparison type:');
+        return getMemberComparison()
+          .should.be.rejectedWith(Error, 'Received invalid member comparison type:');
       });
     });
 
