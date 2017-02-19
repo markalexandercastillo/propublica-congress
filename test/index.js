@@ -404,6 +404,38 @@ describe('pro-publica-congress', () => {
           )));
       });
     });
+
+    describe('.getNewMembers()', () => {
+      it("sets 'members' as the first element of the endpoint", () => {
+        return ppc.getNewMembers()
+          .then(() => ignoringVerify(client.get(
+            argThat(endpoint => endpoint.split('/')[0] === 'members')
+          )));
+      });
+
+      it("sets 'new' as the second element of the endpoint", () => {
+        return ppc.getNewMembers()
+          .then(() => ignoringVerify(client.get(
+            argThat(endpoint => endpoint.split('/')[1] === 'new')
+          )));
+      });
+
+      it('sets the offset to 0 by default', () => {
+        return ppc.getNewMembers()
+          .then(() => verify(client.get(
+            anything(),
+            0
+          )));
+      });
+
+      it('sets the given offset', () => {
+        return ppc.getNewMembers({offset: 20})
+          .then(() => verify(client.get(
+            anything(),
+            20
+          )));
+      });
+    });
   });
 });
 

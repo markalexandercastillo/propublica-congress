@@ -48,6 +48,16 @@ function validateBillId(billId) {
 
 const proto = {
   /**
+   * Resolves to a list of the most recent new members of the current Congress.
+   * 
+   * @see https://propublica.github.io/congress-api-docs/#get-new-members
+   * @param {Object} [{offset = 0}={}] 
+   * @returns {Promise}
+   */
+  getNewMembers({offset = 0} = {}) {
+    return this.client.get('members/new', offset);
+  },
+  /**
    * Resolves to a list of members of a particular chamber in a particular Congress.
    * 
    * @see https://propublica.github.io/congress-api-docs/#lists-of-members
