@@ -87,7 +87,20 @@ function isValidBillId(billId) {
   return /hres\d+/.test(billId);
 }
 
+/**
+ * Whether the given memberId looks valid and could be used with the API
+ * 
+ * @param {String} memberId 
+ * @returns {Boolean}
+ */
+function isValidMemberId(memberId) {
+  let match;
+  return (typeof memberId === 'string' || memberId instanceof String)
+    && !!(match = memberId.match(/[A-Z]\d{6}/)) && !!match && match[0] === memberId;
+}
+
 module.exports = {
+  isValidMemberId,
   isValidBillId,
   isValidCongress,
   isValidChamber,

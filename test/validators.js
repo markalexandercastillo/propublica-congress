@@ -152,4 +152,19 @@ describe('validators', () => {
       validators.isValidBillId({}).should.be.false;
     });
   });
+
+  describe('isValidMemberId()', () => {
+    it('accepts a capital letter followed by 6 numbers', () => {
+      validators.isValidMemberId('K000388').should.be.true;
+    });
+
+    it('rejects everything else', () => {
+      validators.isValidMemberId('k000388').should.be.false;
+      validators.isValidMemberId('K00038').should.be.false;
+      validators.isValidMemberId('KK000388').should.be.false;
+      validators.isValidMemberId(123).should.be.false;
+      validators.isValidMemberId(null).should.be.false;
+      validators.isValidMemberId({}).should.be.false;
+    });
+  });
 });
