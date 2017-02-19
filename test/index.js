@@ -698,6 +698,62 @@ describe('pro-publica-congress', () => {
         ).should.be.rejectedWith(Error, 'Received invalid member comparison type:');
       });
     });
+
+    describe('.getCurrentSenators()', () => {
+
+    });
+
+    describe('.getCurrentRepresentatives()', () => {
+
+    });
+
+    describe('.getLeavingMembers()', () => {
+
+    });
+
+    describe('.getBillsByMember()', () => {
+
+    });
+
+    describe('.getRollCallVotes()', () => {
+
+    });
+
+    describe('.getVotesByDate()', () => {
+
+    });
+
+    describe('.getVotes()', () => {
+
+    });
+
+    describe('.getSenateNominationVotes()', () => {
+
+    });
+
+    describe('.getNominees()', () => {
+
+    });
+
+    describe('.getNominee()', () => {
+
+    });
+
+    describe('.getNomineesByState()', () => {
+
+    });
+
+    describe('.getStatePartyCounts()', () => {
+
+    });
+
+    describe('.getCommittees()', () => {
+
+    });
+
+    describe('.getCommitteeMembership()', () => {
+
+    });
   });
 });
 
