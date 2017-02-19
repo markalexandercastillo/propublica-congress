@@ -139,7 +139,7 @@ describe('pro-publica-congress', () => {
       });
 
       it('validates against the 105th congress as the earliest', () => {
-        return ppc.getBill('some_chamber', 'some_recent_bill_type')
+        return ppc.getBill('some_bill_id')
           .then(() => verify(validators.isValidCongress(anything(), 105)));
       });
 
