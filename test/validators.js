@@ -141,7 +141,7 @@ describe('validators', () => {
 
   describe('isValidBillId()', () => {
     it("accepts strings that begin with 'hr' followed by numbers", () => {
-      validators.isValidBillId('hr123').should.be.true;
+      validators.isValidBillId('hres123').should.be.true;
     });
 
     it("rejects anything that doesn't begin with 'hr' followed by numbers", () => {

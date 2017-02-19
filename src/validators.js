@@ -84,7 +84,7 @@ function isValidApiKey(apiKey) {
  * @returns {Boolean}
  */
 function isValidBillId(billId) {
-  return /hr\d+/.test(billId);
+  return /hres\d+/.test(billId);
 }
 
 module.exports = {
