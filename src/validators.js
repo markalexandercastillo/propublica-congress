@@ -78,7 +78,17 @@ function isValidApiKey(apiKey) {
     && apiKey.length > 0;
 }
 
+/**
+ * Whether the given billId is appropriate for use with the API
+ * @param {String} billId 
+ * @returns {Boolean}
+ */
+function isValidBillId(billId) {
+  return /hr\d+/.test(billId);
+}
+
 module.exports = {
+  isValidBillId,
   isValidCongress,
   isValidChamber,
   isValidType,
