@@ -1,8 +1,7 @@
 const {create, assign} = Object
   , {stringify} = JSON
   , client = require('./client')
-  , validators = require('./validators')
-  ;
+  , validators = require('./validators');
 
 const recentBillTypes = new Set([
   'introduced',
