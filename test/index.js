@@ -28,6 +28,9 @@ describe('pro-publica-congress', () => {
 
     ignoringWhen(validators.isValidBillId())
       .thenReturn(true);
+    
+    ignoringWhen(validators.isValidMemberId())
+      .thenReturn(true);
   });
 
   describe('create()', () => {
@@ -430,6 +433,46 @@ describe('pro-publica-congress', () => {
 
       it('sets the given offset', () => {
         return ppc.getNewMembers({offset: 20})
+          .then(() => verify(client.get(
+            anything(),
+            20
+          )));
+      });
+    });
+
+    describe('.getVotesByMember()', () => {
+      it("sets 'members' as the first element of the endpoint", () => {
+        return ppc.getVotesByMember('some_member_id')
+          .then(() => ignoringVerify(client.get(
+            argThat(endpoint => endpoint.split('/')[0] === 'members')
+          )));
+      });
+
+      it('sets the given member ID as the second element of the endpoint', () => {
+        return ppc.getVotesByMember('some_member_id')
+          .then(() => ignoringVerify(client.get(
+            argThat(endpoint => endpoint.split('/')[1] === 'some_member_id')
+          )));
+      }); 
+
+      it('rejects with an invalid member ID', () => {
+        when(validators.isValidMemberId('some_member_id'))
+          .thenReturn(false);
+
+        return ppc.getVotesByMember('some_member_id')
+          .should.be.rejectedWith(Error, 'Received invalid member ID:');
+      });
+
+      it('sets the offset to 0 by default', () => {
+        return ppc.getVotesByMember('some_member_id')
+          .then(() => verify(client.get(
+            anything(),
+            0
+          )));
+      });
+
+      it('sets the given offset', () => {
+        return ppc.getVotesByMember('some_member_id', {offset: 20})
           .then(() => verify(client.get(
             anything(),
             20

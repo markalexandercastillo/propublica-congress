@@ -46,7 +46,27 @@ function validateBillId(billId) {
   );
 }
 
+function validateMemberId(memberId) {
+  return new Promise((resolve, reject) => validators.isValidMemberId(memberId)
+    ? resolve()
+    : reject(new Error(`Received invalid member ID: ${stringify(memberId)}`))
+  );
+}
+
 const proto = {
+  /**
+   * Resolves to the most recent vote positions for a specific member of the House of
+   * Representatives or Senate
+   * 
+   * @see https://propublica.github.io/congress-api-docs/#get-a-specific-member-39-s-vote-positions
+   * @param {String} memberId 
+   * @param {Object} [{offset = 0}={}] 
+   * @returns {Promise}
+   */
+  getVotesByMember(memberId, {offset = 0} = {}) {
+    return validateMemberId(memberId)
+      .then(() => this.client.get(`members/${memberId}`, offset));
+  },
   /**
    * Resolves to a list of the most recent new members of the current Congress.
    * 

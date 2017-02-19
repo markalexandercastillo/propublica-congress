@@ -32,7 +32,7 @@ function isValidResponse(response) {
  * @return {Boolean}
  */
 function isValidType(type, typeSet = new Set([])) {
-  return (typeof type === 'string' || type instanceof String)
+  return !!type
     && !!type.length
     && typeSet.has(type);
 }
@@ -74,8 +74,7 @@ function isValidCongress(session, earliestSession) {
  * @return {Boolean}
  */
 function isValidApiKey(apiKey) {
-  return (typeof apiKey === 'string' || apiKey instanceof String)
-    && apiKey.length > 0;
+  return !!apiKey && !!apiKey.length && apiKey.length > 0;
 }
 
 /**
@@ -95,7 +94,7 @@ function isValidBillId(billId) {
  */
 function isValidMemberId(memberId) {
   let match;
-  return (typeof memberId === 'string' || memberId instanceof String)
+  return !!(memberId && memberId.match)
     && !!(match = memberId.match(/[A-Z]\d{6}/)) && !!match && match[0] === memberId;
 }
 
