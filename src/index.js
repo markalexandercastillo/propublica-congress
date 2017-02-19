@@ -50,6 +50,8 @@ const proto = {
   /**
    * Resolves to additional details about a particular bill of the given type.
    * 
+   * @see https://propublica.github.io/congress-api-docs/#get-a-subjects-amendments-and-related-bills-for-a-specific-bill
+   * @see https://propublica.github.io/congress-api-docs/#get-cosponsors-for-a-specific-bill
    * @param {String} billId
    * @param {String} additionalBillDetailType 'subjects', 'amendments', 'related', or 'cosponsors'
    * @param {Object} [{congress = this.congress, offset = 0}={}] 
@@ -65,6 +67,7 @@ const proto = {
   /**
    * Resolves to details about a particular bill, including actions taken and votes.
    * 
+   * @see https://propublica.github.io/congress-api-docs/#get-a-specific-bill
    * @param {String} billId 
    * @param {Object} [{congress = this.congress}={}] 
    * @returns {Promise}
@@ -80,6 +83,7 @@ const proto = {
    * “recent bills” can be one of four types. For previous Congresses, “recent bills” means the last
    * 20 bills of that Congress.
    * 
+   * @see https://propublica.github.io/congress-api-docs/#get-recent-bills
    * @param {String} chamber 'senate' or 'house'
    * @param {String} recentBillType
    * @param {Object} [{congress = this.congress, offset = 0}={}] 
