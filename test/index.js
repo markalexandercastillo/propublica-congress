@@ -1,6 +1,5 @@
 const {replace, when, verify, object, matchers: {
-  anything,
-  argThat
+  anything
 }} = require('testdouble');
 
 require('chai').use(require('chai-as-promised')).should();
@@ -71,38 +70,17 @@ describe('pro-publica-congress', () => {
     });
 
     describe('.getRecentBills()', () => {
-      it('sets the default congress as the first element of the endpoint', () => {
+      it("performs a request to an endpoint resembling '{congress}/{chamber}/bills/{recent-bill-type}'", () => {
         return ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
           .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[0] === '115')
+            '115/some_chamber/bills/some_recent_bill_type'
           )));
       });
 
-      it('sets the given congress as the first element of the endpoint', () => {
+      it("performs request to the endpoint respecting the given congress", () => {
         return ppc.getRecentBills('some_chamber', 'some_recent_bill_type', {congress: 114})
           .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[0] === '114')
-          )));
-      });
-
-      it('sets the given chamber as the second element of the endpoint', () => {
-        return ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[1] === 'some_chamber')
-          )));
-      });
-
-      it("sets 'bills' as the third element of the endpoint", () => {
-        return ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[2] === 'bills')
-          )));
-      });
-
-      it('sets the given recent bill type as the fourth element of the endpoint', () => {
-        return ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[3] === 'some_recent_bill_type')
+            '114/some_chamber/bills/some_recent_bill_type'
           )));
       });
 
@@ -170,31 +148,17 @@ describe('pro-publica-congress', () => {
     });
 
     describe('.getBill()', () => {
-      it('sets the default congress as the first element of the endpoint', () => {
+      it("performs a request to an endpoint resembling '{congress}/bills/{bill-id}'", () => {
         return ppc.getBill('some_bill_id')
           .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[0] === '115')
+            '115/bills/some_bill_id'
           )));
       });
 
-      it('sets the given congress as the first element of the endpoint', () => {
+      it("performs request to the endpoint respecting the given congress", () => {
         return ppc.getBill('some_bill_id', {congress: 114})
           .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[0] === '114')
-          )));
-      });
-
-      it("sets 'bills' as the second element of the endpoint", () => {
-        return ppc.getBill('some_bill_id')
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[1] === 'bills')
-          )));
-      });
-
-      it('sets the given bill ID as the third element of the endpoint', () => {
-        return ppc.getBill('some_bill_id')
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[2] === 'some_bill_id')
+            '114/bills/some_bill_id'
           )));
       });
 
@@ -224,38 +188,17 @@ describe('pro-publica-congress', () => {
     });
 
     describe('.getAdditionalBillDetails()', () => {
-      it('sets the default congress as the first element of the endpoint', () => {
+      it("performs a request to an endpoint resembling '{congress}/bills/{bill-id}/{additional-bill-detail-type}'", () => {
         return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type')
           .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[0] === '115')
+            '115/bills/some_bill_id/some_additional_bill_detail_type'
           )));
       });
 
-      it('sets the given congress as the first element of the endpoint', () => {
+      it("performs request to the endpoint respecting the given congress", () => {
         return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type', {congress: 114})
           .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[0] === '114')
-          )));
-      });
-
-      it("sets 'bills' as the second element of the endpoint", () => {
-        return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type')
-          .then(() => ignoringVerify(
-            client.get(argThat(endpoint => endpoint.split('/')[1] === 'bills')
-          )));
-      });
-
-      it('sets the given bill ID as the third element of the endpoint', () => {
-        return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type')
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[2] === 'some_bill_id')
-          )));
-      });
-
-      it('sets the given additional bill detail type as the fourth element of the endpoint', () => {
-        return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type')
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[3] === 'some_additional_bill_detail_type')
+            '114/bills/some_bill_id/some_additional_bill_detail_type'
           )));
       });
 
@@ -323,31 +266,17 @@ describe('pro-publica-congress', () => {
     });
     
     describe('.getMemberList()', () => {
-      it('sets the default congress as the first element of the endpoint', () => {
+      it("performs a request to an endpoint resembling '{congress}/{chamber}/members'", () => {
         return ppc.getMemberList('some_chamber')
           .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[0] === '115')
+            '115/some_chamber/members'
           )));
       });
 
-      it('sets the given congress as the first element of the endpoint', () => {
+      it("performs request to the endpoint respecting the given congress", () => {
         return ppc.getMemberList('some_chamber', {congress: 114})
           .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[0] === '114')
-          )));
-      });
-
-      it('sets the given chamber as the second element of the endpoint', () => {
-        return ppc.getMemberList('some_chamber')
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[1] === 'some_chamber')
-          )));
-      });
-
-      it("sets 'members' as the third element of the endpoint", () => {
-        return ppc.getMemberList('some_chamber')
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[2] === 'members')
+            '114/some_chamber/members'
           )));
       });
 
@@ -409,17 +338,10 @@ describe('pro-publica-congress', () => {
     });
 
     describe('.getNewMembers()', () => {
-      it("sets 'members' as the first element of the endpoint", () => {
+      it("performs a request to an endpoint resembling 'members/new'", () => {
         return ppc.getNewMembers()
           .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[0] === 'members')
-          )));
-      });
-
-      it("sets 'new' as the second element of the endpoint", () => {
-        return ppc.getNewMembers()
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[1] === 'new')
+            'members/new'
           )));
       });
 
@@ -441,19 +363,12 @@ describe('pro-publica-congress', () => {
     });
 
     describe('.getVotesByMember()', () => {
-      it("sets 'members' as the first element of the endpoint", () => {
+      it("performs a request to an endpoint resembling 'members/{member-id}/votes'", () => {
         return ppc.getVotesByMember('some_member_id')
           .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[0] === 'members')
+            'members/some_member_id/votes'
           )));
       });
-
-      it('sets the given member ID as the second element of the endpoint', () => {
-        return ppc.getVotesByMember('some_member_id')
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[1] === 'some_member_id')
-          )));
-      }); 
 
       it('rejects with an invalid member ID', () => {
         when(validators.isValidMemberId('some_member_id'))
@@ -514,17 +429,17 @@ describe('pro-publica-congress', () => {
         );
       }
 
-      it("makes request to an endpoint resembling 'members/{first-member-id}/{member-comparison-type}/{second-member-id}/{congress}/{chamber}'", () => {
+      it("performs request to an endpoint resembling 'members/{first-member-id}/{member-comparison-type}/{second-member-id}/{congress}/{chamber}'", () => {
         return getMemberComparison()
           .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint === 'members/some_member_id/some_member_comparison_type/some_other_member_id/115/some_chamber')
+            'members/some_member_id/some_member_comparison_type/some_other_member_id/115/some_chamber'
           )));
       });
 
-      it("makes request to an endpoint respecting the given congress", () => {
+      it("performs request to an endpoint respecting the given congress", () => {
         return getMemberComparison({congress: 114})
           .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint === 'members/some_member_id/some_member_comparison_type/some_other_member_id/114/some_chamber')
+            'members/some_member_id/some_member_comparison_type/some_other_member_id/114/some_chamber'
           )));
       });
 
