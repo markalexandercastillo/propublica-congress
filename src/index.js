@@ -33,13 +33,22 @@ function isValidType(type, typeSet, descriptor) {
 }
 
 const proto = {
+  /**
+   * Resolves to summaries of the 20 most recent bills by type. For the current Congress,
+   * “recent bills” can be one of four types. For previous Congresses, “recent bills” means the last
+   * 20 bills of that Congress.
+   * 
+   * @param {String} chamber 'senate' or 'house'
+   * @param {String} recentBillType
+   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @returns {Promise}
+   */
   getRecentBills(chamber, recentBillType, {congress = this.congress, offset = 0} = {}) {
-    const endpoint = `${congress}/${chamber}/bills/${recentBillType}`;
     return Promise.all([
       isValidChamber(chamber),
       isValidCongress(congress, 105),
-      isValidType(recentBillType, recentBillTypes)
-    ]).then(() => this.client.get(endpoint, offset));
+      isValidType(recentBillType, recentBillTypes, 'recent bill type')
+    ]).then(() => this.client.get(`${congress}/${chamber}/bills/${recentBillType}`, offset));
   }
 };
 
