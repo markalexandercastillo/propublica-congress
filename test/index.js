@@ -319,7 +319,7 @@ describe('pro-publica-congress', () => {
       });
     });
     
-    describe('getMemberList()', () => {
+    describe('.getMemberList()', () => {
       it('sets the default congress as the first element of the endpoint', () => {
         return ppc.getMemberList('some_chamber')
           .then(() => ignoringVerify(client.get(
