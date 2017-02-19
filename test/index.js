@@ -40,62 +40,63 @@ describe('pro-publica-congress', () => {
     beforeEach(() => {
       client = object(['get']);
       when(clientModule.create(anything())).thenReturn(client);
+      when(client.get(), {ignoreExtraArgs}).thenResolve({});
       ppc = createPpc('SOME_KEY', 115);
     });
 
     describe('.getRecentBills()', () => {
       it('sets the default congress as the first element of the endpoint', () => {
-        ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
+        return ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
           .then(() => verify(client.get(argThat(endpoint => endpoint.split('/')[0] === '115')), {ignoreExtraArgs}));
       });
 
       it('sets the given congress as the first element of the endpoint', () => {
-        ppc.getRecentBills('some_chamber', 'some_recent_bill_type', {congress: 114})
+        return ppc.getRecentBills('some_chamber', 'some_recent_bill_type', {congress: 114})
           .then(() => verify(client.get(argThat(endpoint => endpoint.split('/')[0] === '114')), {ignoreExtraArgs}));
       });
 
       it('sets the given chamber as the second element of the endpoint', () => {
-        ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
+        return ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
           .then(() => verify(client.get(argThat(endpoint => endpoint.split('/')[1] === 'some_chamber')), {ignoreExtraArgs}));
       });
 
       it("sets 'bills' as the third element of the endpoint", () => {
-        ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
+        return ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
           .then(() => verify(client.get(argThat(endpoint => endpoint.split('/')[2] === 'bills')), {ignoreExtraArgs}));
       });
 
       it('sets the given recent bill type as the fourth element of the endpoint', () => {
-        ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
+        return ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
           .then(() => verify(client.get(argThat(endpoint => endpoint.split('/')[3] === 'some_recent_bill_type')), {ignoreExtraArgs}));
       });
 
       it('sets the offset to 0 by default', () => {
-        ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
+        return ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
           .then(() => verify(client.get(anything(), 0)));
       });
 
       it('sets the given offset', () => {
-        ppc.getRecentBills('some_chamber', 'some_recent_bill_type', {offset: 20})
+        return ppc.getRecentBills('some_chamber', 'some_recent_bill_type', {offset: 20})
           .then(() => verify(client.get(anything(), 20)));
       });
 
       it('rejects with an invalid chamber', () => {
         when(validators.isValidChamber('some_chamber')).thenReturn(false);
-        ppc.getRecentBills('some_chamber', 'some_recent_bill_type').should.be.rejectedWith(Error, 'Received invalid chamber:');
+        return ppc.getRecentBills('some_chamber', 'some_recent_bill_type').should.be.rejectedWith(Error, 'Received invalid chamber:');
       });
 
       it('rejects with an invalid congress', () => {
         when(validators.isValidCongress(114), {ignoreExtraArgs}).thenReturn(false);
-        ppc.getRecentBills('some_chamber', 'some_recent_bill_type', {congress: 114}).should.be.rejectedWith(Error, 'Received invalid congress:');
+        return ppc.getRecentBills('some_chamber', 'some_recent_bill_type', {congress: 114}).should.be.rejectedWith(Error, 'Received invalid congress:');
       });
 
       it('validates against the 105th congress as the earliest', () => {
-        ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
+        return ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
           .then(() => verify(validators.isValidCongress(anything(), 105)));
       });
 
       it('validates against recent bill types', () => {
-        ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
+        return ppc.getRecentBills('some_chamber', 'some_recent_bill_type')
           .then(() => verify(validators.isValidType('some_recent_bill_type', new Set([
             'introduced',
             'updated',
@@ -106,7 +107,7 @@ describe('pro-publica-congress', () => {
 
       it('rejects with an invalid recent bill type', () => {
         when(validators.isValidType('some_recent_bill_type'), {ignoreExtraArgs}).thenReturn(false);
-        ppc.getRecentBills('some_chamber', 'some_recent_bill_type').should.be.rejectedWith(Error, 'Received invalid recent bill type:');
+        return ppc.getRecentBills('some_chamber', 'some_recent_bill_type').should.be.rejectedWith(Error, 'Received invalid recent bill type:');
       });
     });
   });
