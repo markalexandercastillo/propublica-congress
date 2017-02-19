@@ -39,10 +39,10 @@ describe('pro-publica-congress', () => {
     );
 
     it('throws with an invalid congress', () => {
-      when(validators.isValidCongress('{congress}'))
+      when(validators.isValidCongress('{invalid-congress}'))
         .thenReturn(false);
 
-      (() => createPpc('PROPUBLICA_API_KEY', '{congress}'))
+      (() => createPpc('PROPUBLICA_API_KEY', '{invalid-congress}'))
         .should.throw(Error, 'Received invalid congress:');
     });
 
@@ -101,10 +101,10 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid chamber', () => {
-        when(validators.isValidChamber('{chamber}'))
+        when(validators.isValidChamber('{invalid-chamber}'))
           .thenReturn(false);
 
-        return ppc.getRecentBills('{chamber}', '{recent-bill-type}')
+        return ppc.getRecentBills('{invalid-chamber}', '{recent-bill-type}')
           .should.be.rejectedWith(Error, 'Received invalid chamber:');
       });
 
@@ -528,10 +528,10 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid member comparison type', () => {
-        ignoringWhen(validators.isValidType('{member-comparison-type}'))
+        ignoringWhen(validators.isValidType('{invalid-member-comparison-type}'))
           .thenReturn(false);
 
-        return getMemberComparison()
+        return getMemberComparison({memberComparisonType: '{invalid-member-comparison-type}'})
           .should.be.rejectedWith(Error, 'Received invalid member comparison type:');
       });
     });
