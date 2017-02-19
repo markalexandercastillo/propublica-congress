@@ -67,10 +67,8 @@ const proto = {
    */
   getMemberList(chamber, {congress = this.congress, offset = 0} = {}) {
     return validateChamber(chamber)
-      .then(() => validateCongress(congress, {
-        senate: 80,
-        house: 102}[chamber])
-      ).then(() => this.client.get(`${congress}/${chamber}/members`, offset));
+      .then(() => validateCongress(congress, {senate: 80, house: 102}[chamber]))
+      .then(() => this.client.get(`${congress}/${chamber}/members`, offset));
   },
   /**
    * Resolves to additional details about a particular bill of the given type.
