@@ -148,6 +148,73 @@ describe('pro-publica-congress', () => {
         return ppc.getBill('some_bill_id').should.be.rejectedWith(Error, 'Received invalid bill ID:');
       });
     });
+
+    describe('.getAdditionalBillDetails()', () => {
+      it('sets the default congress as the first element of the endpoint', () => {
+        return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type')
+          .then(() => verify(client.get(argThat(endpoint => endpoint.split('/')[0] === '115')), {ignoreExtraArgs}));
+      });
+
+      it('sets the given congress as the first element of the endpoint', () => {
+        return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type', {congress: 114})
+          .then(() => verify(client.get(argThat(endpoint => endpoint.split('/')[0] === '114')), {ignoreExtraArgs}));
+      });
+
+      it("sets 'bills' as the second element of the endpoint", () => {
+        return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type')
+          .then(() => verify(client.get(argThat(endpoint => endpoint.split('/')[1] === 'bills')), {ignoreExtraArgs}));
+      });
+
+      it('sets the given bill ID as the third element of the endpoint', () => {
+        return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type')
+          .then(() => verify(client.get(argThat(endpoint => endpoint.split('/')[2] === 'some_bill_id')), {ignoreExtraArgs}));
+      });
+
+      it('sets the given additional bill detail type as the fourth element of the endpoint', () => {
+        return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type')
+          .then(() => verify(client.get(argThat(endpoint => endpoint.split('/')[3] === 'some_additional_bill_detail_type')), {ignoreExtraArgs}));
+      });
+
+      it('rejects with an invalid congress', () => {
+        when(validators.isValidCongress(114), {ignoreExtraArgs}).thenReturn(false);
+        return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type', {congress: 114}).should.be.rejectedWith(Error, 'Received invalid congress:');
+      });
+
+      it('validates against the 105th congress as the earliest', () => {
+        return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type')
+          .then(() => verify(validators.isValidCongress(anything(), 105)));
+      });
+
+      it('rejects with an invalid bill ID', () => {
+        when(validators.isValidBillId('some_bill_id')).thenReturn(false);
+        return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type').should.be.rejectedWith(Error, 'Received invalid bill ID:');
+      });
+
+      it('validates against recent bill types', () => {
+        return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type')
+          .then(() => verify(validators.isValidType('some_additional_bill_detail_type', new Set([
+            'subjects',
+            'amendments',
+            'related',
+            'cosponsors'
+          ]))));
+      });
+
+      it('rejects with an invalid recent bill type', () => {
+        when(validators.isValidType('some_additional_bill_detail_type'), {ignoreExtraArgs}).thenReturn(false);
+        return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type').should.be.rejectedWith(Error, 'Received invalid additional bill detail type:');
+      });
+
+      it('sets the offset to 0 by default', () => {
+        return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type')
+          .then(() => verify(client.get(anything(), 0)));
+      });
+
+      it('sets the given offset', () => {
+        return ppc.getAdditionalBillDetails('some_bill_id', 'some_additional_bill_detail_type', {offset: 20})
+          .then(() => verify(client.get(anything(), 20)));
+      });
+    })
   });
 });
 

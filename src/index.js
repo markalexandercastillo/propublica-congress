@@ -11,6 +11,13 @@ const recentBillTypes = new Set([
   'major'
 ]);
 
+const additionalBillDetailTypes = new Set([
+  'subjects',
+  'amendments',
+  'related',
+  'cosponsors'
+]);
+
 function validateChamber(chamber) {
   return new Promise((resolve, reject) => validators.isValidChamber(chamber)
     ? resolve()
@@ -40,6 +47,21 @@ function validateBillId(billId) {
 }
 
 const proto = {
+  /**
+   * Resolves to additional details about a particular bill of the given type.
+   * 
+   * @param {String} billId
+   * @param {String} additionalBillDetailType 'subjects', 'amendments', 'related', or 'cosponsors'
+   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @returns 
+   */
+  getAdditionalBillDetails(billId, additionalBillDetailType, {congress = this.congress, offset = 0} = {}) {
+    return Promise.all([
+      validateCongress(congress, 105),
+      validateBillId(billId),
+      validateType(additionalBillDetailType, additionalBillDetailTypes, 'additional bill detail type')
+    ]).then(() => this.client.get(`${congress}/bills/${billId}/${additionalBillDetailType}`, offset));
+  },
   /**
    * Resolves to details about a particular bill, including actions taken and votes.
    * 
