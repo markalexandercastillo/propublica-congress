@@ -11,23 +11,23 @@ const recentBillTypes = new Set([
   'major'
 ]);
 
-function isValidChamber(chamber) {
+function validateChamber(chamber) {
   return new Promise((resolve, reject) => validators.isValidChamber(chamber)
-    ? resolve(true)
+    ? resolve()
     : reject(new Error(`Received invalid chamber: ${stringify(chamber)}`))
   );
 }
 
-function isValidCongress(session, earliestSession) {
+function validateCongress(session, earliestSession) {
   return new Promise((resolve, reject) => validators.isValidCongress(session, earliestSession)
-    ? resolve(true)
+    ? resolve()
     : reject(new Error(`Received invalid congress: ${stringify(session)}`))
   );
 }
 
-function isValidType(type, typeSet, descriptor) {
+function validateType(type, typeSet, descriptor) {
   return new Promise((resolve, reject) => validators.isValidType(type, typeSet)
-    ? resolve(true)
+    ? resolve()
     : reject(new Error(`Received invalid ${descriptor}: ${stringify(type)}`))
   );
 }
@@ -45,9 +45,9 @@ const proto = {
    */
   getRecentBills(chamber, recentBillType, {congress = this.congress, offset = 0} = {}) {
     return Promise.all([
-      isValidChamber(chamber),
-      isValidCongress(congress, 105),
-      isValidType(recentBillType, recentBillTypes, 'recent bill type')
+      validateChamber(chamber),
+      validateCongress(congress, 105),
+      validateType(recentBillType, recentBillTypes, 'recent bill type')
     ]).then(() => this.client.get(`${congress}/${chamber}/bills/${recentBillType}`, offset));
   }
 };
