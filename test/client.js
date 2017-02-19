@@ -7,7 +7,9 @@ const {replace, when, verify, matchers: {
 
 require('chai').use(require('chai-as-promised')).should();
 
-const ignoreExtraArgs = true;
+// aliases to verify and when with the ignoreExtraArgs config option set to true
+const ignoringWhen = fakeInvocation => when(fakeInvocation, {ignoreExtraArgs: true});
+const ignoringVerify = fakeInvocation => verify(fakeInvocation, {ignoreExtraArgs: true});
 
 describe('client', () => {
   let http, createClient, validators;
@@ -17,9 +19,14 @@ describe('client', () => {
     createClient = require('./../src/client').create;
 
     // validation invocations pass by default
-    when(validators.isValidOffset(), {ignoreExtraArgs}).thenReturn(true);
-    when(validators.isValidResponse(), {ignoreExtraArgs}).thenReturn(true);
-    when(validators.isValidApiKey(), {ignoreExtraArgs}).thenReturn(true);
+    ignoringWhen(validators.isValidOffset())
+      .thenReturn(true);
+
+    ignoringWhen(validators.isValidResponse())
+      .thenReturn(true);
+
+    ignoringWhen(validators.isValidApiKey())
+      .thenReturn(true);
   });
 
   describe('create()', () => {
@@ -29,8 +36,11 @@ describe('client', () => {
     );
 
     it('throws with an invalid key', () => {
-      when(validators.isValidApiKey(anything())).thenReturn(false);
-      (() => createClient()).should.throw(Error, 'Received invalid API key:');
+      when(validators.isValidApiKey(anything()))
+        .thenReturn(false);
+
+      (() => createClient())
+        .should.throw(Error, 'Received invalid API key:');
     });
   });
 
@@ -38,7 +48,9 @@ describe('client', () => {
     let client;
     beforeEach(() => {
       client = createClient('SOME_KEY');
-      when(http.get(), {ignoreExtraArgs}).thenResolve({body: {results: ['']}});
+
+      ignoringWhen(http.get())
+        .thenResolve({body: {results: ['']}});
     });
 
     it("sets the 'X-API-Key' header with the given key", () => {
@@ -67,40 +79,48 @@ describe('client', () => {
 
     it("performs the request to the ProPublica API host", () => {
       return client.get('some/endpoint')
-        .then(() => verify(http.get(
+        .then(() => ignoringVerify(http.get(
           argThat(url => url.indexOf('https://api.propublica.org') === 0)
-        ), {ignoreExtraArgs}));
+        )));
     });
 
 
     it("performs the request to version 1 of ProPublica's Congres API", () => {
       return client.get('some/endpoint')
-        .then(() => verify(http.get(
+        .then(() => ignoringVerify(http.get(
           argThat(url => URL.parse(url).path.indexOf('/congress/v1/') === 0)
-        ), {ignoreExtraArgs}));
+        )));
     });
 
     it("performs the request to the JSON variant of the endpoint", () => {
       return client.get('some/endpoint')
-        .then(() => verify(http.get(
+        .then(() => ignoringVerify(http.get(
           argThat(url => url.substr(-'some/endpoint.json'.length) === 'some/endpoint.json')
-        ), {ignoreExtraArgs}));
+        )));
     });
 
     it("resolves to the first element of the 'results' key of the response body", () => {
-      when(http.get(), {ignoreExtraArgs}).thenResolve({body: {results: ['relevantData']}});
+      ignoringWhen(http.get())
+        .thenResolve({body: {results: ['relevantData']}});
+
       return client.get('some/endpint').should.become('relevantData');
     });
 
     it("rejects if the response came back with an invalid response structure", () => {
-      when(validators.isValidResponse('invalid response structure')).thenReturn(false);
-      when(http.get(), {ignoreExtraArgs}).thenResolve('invalid response structure');
+      when(validators.isValidResponse('invalid response structure'))
+        .thenReturn(false);
+
+      ignoringWhen(http.get())
+        .thenResolve('invalid response structure');
+
       return client.get('some/endpoint')
         .should.be.rejectedWith(Error, 'Received invalid response structure:');
     });
 
     it('rejects if given an invalid offset value', () => {
-      when(validators.isValidOffset('an invalid offset')).thenReturn(false);
+      when(validators.isValidOffset('an invalid offset'))
+        .thenReturn(false);
+
       return client.get('some/endpoint', 'an invalid offset')
         .should.be.rejectedWith(Error, 'Received invalid offset:');
     });
