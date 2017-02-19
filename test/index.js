@@ -514,52 +514,17 @@ describe('pro-publica-congress', () => {
         );
       }
 
-      it("sets 'members' as the first element of the endpoint", () => {
+      it("makes request to an endpoint resembling 'members/{first-member-id}/{member-comparison-type}/{second-member-id}/{congress}/{chamber}'", () => {
         return getMemberComparison()
           .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[0] === 'members')
+            argThat(endpoint => endpoint === 'members/some_member_id/some_member_comparison_type/some_other_member_id/115/some_chamber')
           )));
       });
 
-      it("sets the given first member ID as the second element of the endpoint", () => {
-        return getMemberComparison()
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[1] === 'some_member_id')
-          )));
-      });
-
-      it("sets the given comparison type as the third element of the endpoint", () => {
-        return getMemberComparison()
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[2] === 'some_member_comparison_type')
-          )));
-      });
-
-      it("sets the given second member ID as the fourth element of the endpoint", () => {
-        return getMemberComparison()
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[3] === 'some_other_member_id')
-          )));
-      });
-
-      it("sets the default congress as the fifth element of the endpoint", () => {
-        return getMemberComparison()
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[4] === '115')
-          )));
-      });
-
-      it("sets the given congress as the fifth element of the endpoint", () => {
+      it("makes request to an endpoint respecting the given congress", () => {
         return getMemberComparison({congress: 114})
           .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[4] === '114')
-          )));
-      });
-
-      it("sets the given chamber as the sixth element of the endpoint", () => {
-        return getMemberComparison()
-          .then(() => ignoringVerify(client.get(
-            argThat(endpoint => endpoint.split('/')[5] === 'some_chamber')
+            argThat(endpoint => endpoint === 'members/some_member_id/some_member_comparison_type/some_other_member_id/114/some_chamber')
           )));
       });
 
