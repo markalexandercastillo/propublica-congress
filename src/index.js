@@ -18,6 +18,11 @@ const additionalBillDetailTypes = new Set([
   'cosponsors'
 ]);
 
+const memberComparisonTypes = new Set([
+  'bills',
+  'votes'
+]);
+
 function validateChamber(chamber) {
   return new Promise((resolve, reject) => validators.isValidChamber(chamber)
     ? resolve()
@@ -54,6 +59,30 @@ function validateMemberId(memberId) {
 }
 
 const proto = {
+  /**
+   * Resolves to a comparison of bill sponsorship or vote positions between two members who served
+   * in the same Congress and chamber.
+   * 
+   * @see https://propublica.github.io/congress-api-docs/#compare-two-members-vote-positions
+   * @see https://propublica.github.io/congress-api-docs/#compare-two-members-39-bill-sponsorships
+   * @param {String} firstMemberId 
+   * @param {String} secondMemberId 
+   * @param {String} chamber 'house' or 'senate'
+   * @param {String} memberComparisonType 'bills' or 'votes'
+   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @returns {Promise}
+   */
+  getMemberComparison(firstMemberId, secondMemberId, chamber, memberComparisonType, {congress = this.congress, offset = 0} = {}) {
+    return Promise.all([
+      validateMemberId(firstMemberId),
+      validateMemberId(secondMemberId),
+      validateType(memberComparisonType, memberComparisonTypes, 'member comparison type'),
+      validateChamber(chamber).then(() => validateCongress(congress, {senate: 101, house: 102}[chamber]))
+    ]).then(() => {
+      const endpoint = `members/${firstMemberId}/${memberComparisonType}/${secondMemberId}/${congress}/${chamber}`;
+      return this.client.get(endpoint, offset);
+    });
+  },
   /**
    * Resolves to the most recent vote positions for a specific member of the House of
    * Representatives or Senate
