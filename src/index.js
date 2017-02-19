@@ -32,7 +32,27 @@ function validateType(type, typeSet, descriptor) {
   );
 }
 
+function validateBillId(billId) {
+  return new Promise((resolve, reject) => validators.isValidBillId(billId)
+    ? resolve()
+    : reject(new Error(`Received invalid bill ID: ${stringify(billId)}`))
+  );
+}
+
 const proto = {
+  /**
+   * Resolves to details about a particular bill, including actions taken and votes.
+   * 
+   * @param {String} billId 
+   * @param {Object} [{congress = this.congress}={}] 
+   * @returns {Promise}
+   */
+  getBill(billId, {congress = this.congress} = {}) {
+    return Promise.all([
+      validateCongress(congress, 105),
+      validateBillId(billId)
+    ]).then(() => this.client.get(`${congress}/bills/${billId}`));
+  },
   /**
    * Resolves to summaries of the 20 most recent bills by type. For the current Congress,
    * “recent bills” can be one of four types. For previous Congresses, “recent bills” means the last

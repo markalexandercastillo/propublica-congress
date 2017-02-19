@@ -18,6 +18,7 @@ describe('pro-publica-congress', () => {
     when(validators.isValidCongress(), {ignoreExtraArgs}).thenReturn(true);
     when(validators.isValidChamber(), {ignoreExtraArgs}).thenReturn(true);
     when(validators.isValidType(), {ignoreExtraArgs}).thenReturn(true);
+    when(validators.isValidBillId(), {ignoreExtraArgs}).thenReturn(true);
   });
 
   describe('create()', () => {
@@ -108,6 +109,43 @@ describe('pro-publica-congress', () => {
       it('rejects with an invalid recent bill type', () => {
         when(validators.isValidType('some_recent_bill_type'), {ignoreExtraArgs}).thenReturn(false);
         return ppc.getRecentBills('some_chamber', 'some_recent_bill_type').should.be.rejectedWith(Error, 'Received invalid recent bill type:');
+      });
+    });
+
+    describe('.getBill()', () => {
+      it('sets the default congress as the first element of the endpoint', () => {
+        return ppc.getBill('some_bill_id')
+          .then(() => verify(client.get(argThat(endpoint => endpoint.split('/')[0] === '115')), {ignoreExtraArgs}));
+      });
+
+      it('sets the given congress as the first element of the endpoint', () => {
+        return ppc.getBill('some_bill_id', {congress: 114})
+          .then(() => verify(client.get(argThat(endpoint => endpoint.split('/')[0] === '114')), {ignoreExtraArgs}));
+      });
+
+      it("sets 'bills' as the second element of the endpoint", () => {
+        return ppc.getBill('some_bill_id')
+          .then(() => verify(client.get(argThat(endpoint => endpoint.split('/')[1] === 'bills')), {ignoreExtraArgs}));
+      });
+
+      it('sets the given bill ID as the third element of the endpoint', () => {
+        return ppc.getBill('some_bill_id')
+          .then(() => verify(client.get(argThat(endpoint => endpoint.split('/')[2] === 'some_bill_id')), {ignoreExtraArgs}));
+      });
+
+      it('rejects with an invalid congress', () => {
+        when(validators.isValidCongress(114), {ignoreExtraArgs}).thenReturn(false);
+        return ppc.getBill('some_bill_id', {congress: 114}).should.be.rejectedWith(Error, 'Received invalid congress:');
+      });
+
+      it('validates against the 105th congress as the earliest', () => {
+        return ppc.getBill('some_chamber', 'some_recent_bill_type')
+          .then(() => verify(validators.isValidCongress(anything(), 105)));
+      });
+
+      it('rejects with an invalid bill ID', () => {
+        when(validators.isValidBillId('some_bill_id')).thenReturn(false);
+        return ppc.getBill('some_bill_id').should.be.rejectedWith(Error, 'Received invalid bill ID:');
       });
     });
   });
