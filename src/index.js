@@ -98,8 +98,8 @@ const proto = {
    * Resolves to Senate votes on presidential nominations
    * 
    * @see https://propublica.github.io/congress-api-docs/#get-senate-nomination-votes
-   * @param {any} [{congress = this.congress, offset = 0}={}] 
-   * @returns 
+   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @returns {Promise}
    */
   getSenateNominationVotes({congress = this.congress, offset = 0} = {}) {
     return validateCongress(congress, 101)
