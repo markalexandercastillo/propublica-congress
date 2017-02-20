@@ -995,7 +995,7 @@ describe('pro-publica-congress', () => {
     });
 
     describe('.getPartyCounts()', () => {
-      it.skip("performs a request to an endpoint resembling 'states/members/party'", () => {
+      it("performs a request to an endpoint resembling 'states/members/party'", () => {
         return ppc.getPartyCounts()
           .then(() => ignoringVerify(client.get(
             'states/members/party'

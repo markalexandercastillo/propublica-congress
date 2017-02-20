@@ -59,7 +59,17 @@ function validateMemberId(memberId) {
 
 const proto = {
   /**
+   * Resolves to party membership counts for all states (current Congress only)
+   *
+   * @see https://propublica.github.io/congress-api-docs/#get-state-party-counts
+   * @returns {Promise}
+   */
+  getPartyCounts() {
+    return this.client.get('states/members/party');
+  },
+  /**
    * Resolves to a list of Senate or House committees.
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-committees-and-committee-memberships
    * @param {String} chamber 
    * @param {Object} [{congress = this.congress, offset = 0}={}] 
