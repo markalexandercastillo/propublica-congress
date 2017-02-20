@@ -22,6 +22,13 @@ const memberComparisonTypes = new Set([
   'votes'
 ]);
 
+const nomineeTypes = new Set([
+  'received',
+  'updated',
+  'confirmed',
+  'withdrawn'
+]);
+
 function validateChamber(chamber) {
   return new Promise((resolve, reject) => validators.isValidChamber(chamber)
     ? resolve()
@@ -58,6 +65,20 @@ function validateMemberId(memberId) {
 }
 
 const proto = {
+  /**
+   * Resolves to lists of presidential nominations for civilian positions
+   * 
+   * @see https://propublica.github.io/congress-api-docs/#get-recent-nominations-by-category
+   * @param {String} nomineeType 
+   * @param {Object} [{congress = this.congress}={}] 
+   * @returns {Promise}
+   */
+  getNominees(nomineeType, {congress = this.congress} = {}) {
+    return Promise.all([
+      validateCongress(congress, 107),
+      validateType(nomineeType, nomineeTypes, 'nominee type')
+    ]).then(() => this.client.get(`${congress}/nominees/${nomineeType}`));
+  },
   /**
    * Resolves to party membership counts for all states (current Congress only)
    *

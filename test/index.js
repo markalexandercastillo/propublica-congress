@@ -901,21 +901,21 @@ describe('pro-publica-congress', () => {
     });
 
     describe('.getNominees()', () => {
-      it.skip("performs a request to an endpoint resembling '{congress}/nominees/{nominee-type}'", () => {
+      it("performs a request to an endpoint resembling '{congress}/nominees/{nominee-type}'", () => {
         return ppc.getNominees('{nominee-type}')
           .then(() => ignoringVerify(client.get(
             '{congress}/nominees/{nominee-type}'
           )));
       });
 
-      it.skip("performs request to an endpoint respecting the given congress", () => {
+      it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getNominees('{nominee-type}', {congress: '{different-congress}'})
           .then(() => ignoringVerify(client.get(
             '{different-congress}/nominees/{nominee-type}'
           )));
       });
 
-      it.skip('validates against the 107st congress as the earliest', () => {
+      it('validates against the 107st congress as the earliest', () => {
         return ppc.getNominees('{nominee-type}')
           .then(() => verify(validators.isValidCongress(
             anything(),
@@ -923,7 +923,7 @@ describe('pro-publica-congress', () => {
           )));
       });
 
-      it.skip('rejects with an invalid congress', () => {
+      it('rejects with an invalid congress', () => {
         ignoringWhen(validators.isValidCongress('{invalid-congress}'))
           .thenReturn(false);
 
@@ -931,7 +931,7 @@ describe('pro-publica-congress', () => {
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
 
-      it.skip('validates against nominee types', () => {
+      it('validates against nominee types', () => {
         const expectedTypes = new Set([
           'received',
           'updated',
@@ -945,11 +945,11 @@ describe('pro-publica-congress', () => {
           )));
       });
 
-      it.skip('rejects with an invalid nominee type', () => {
+      it('rejects with an invalid nominee type', () => {
         ignoringWhen(validators.isValidType('{invalid-nominee-type}'))
           .thenReturn(false);
 
-        return ppc.getNominees('{invalid nominee-type}')
+        return ppc.getNominees('{invalid-nominee-type}')
           .should.be.rejectedWith(Error, 'Received invalid nominee type:');
       });
     });
