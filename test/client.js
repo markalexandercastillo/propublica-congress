@@ -22,9 +22,6 @@ describe('client', () => {
     ignoringWhen(validators.isValidOffset())
       .thenReturn(true);
 
-    ignoringWhen(validators.isValidResponse())
-      .thenReturn(true);
-
     ignoringWhen(validators.isValidApiKey())
       .thenReturn(true);
   });
@@ -50,7 +47,7 @@ describe('client', () => {
       client = createClient('SOME_KEY');
 
       ignoringWhen(http.get())
-        .thenResolve({body: {results: ['']}});
+        .thenResolve({});
     });
 
     it("sets the 'X-API-Key' header with the given key", () => {
@@ -84,7 +81,6 @@ describe('client', () => {
         )));
     });
 
-
     it("performs the request to version 1 of ProPublica's Congres API", () => {
       return client.get('some/endpoint')
         .then(() => ignoringVerify(http.get(
@@ -97,24 +93,6 @@ describe('client', () => {
         .then(() => ignoringVerify(http.get(
           argThat(url => url.substr(-'some/endpoint.json'.length) === 'some/endpoint.json')
         )));
-    });
-
-    it("resolves to the first element of the 'results' key of the response body", () => {
-      ignoringWhen(http.get())
-        .thenResolve({body: {results: ['relevantData']}});
-
-      return client.get('some/endpint').should.become('relevantData');
-    });
-
-    it("rejects if the response came back with an invalid response structure", () => {
-      when(validators.isValidResponse('invalid response structure'))
-        .thenReturn(false);
-
-      ignoringWhen(http.get())
-        .thenResolve('invalid response structure');
-
-      return client.get('some/endpoint')
-        .should.be.rejectedWith(Error, 'Received invalid response structure:');
     });
 
     it('rejects if given an invalid offset value', () => {

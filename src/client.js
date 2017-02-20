@@ -28,15 +28,7 @@ const proto = {
     return http.get(
       `${HOST}/congress/v${VERSION}/${endpoint}.json`,
       assign({headers, json: true}, {body})
-    // pluck out relevant data from the body probably from having to
-    // support xml
-    ).then(response => {
-      if (!validators.isValidResponse(response)) {
-        throw new Error(`Received invalid response structure: ${stringify(response)}`);
-      }
-
-      return response.body.results[0];
-    });
+    );
   }
 };
 

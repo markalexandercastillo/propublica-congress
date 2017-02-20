@@ -34,35 +34,6 @@ describe('validators', () => {
     });
   });
 
-  describe('isValidResponse()', () => {
-    it("rejects an argument that doesn't have a 'body' key", () => {
-      validators.isValidResponse({}).should.be.false;
-      validators.isValidResponse().should.be.false;
-      validators.isValidResponse(null).should.be.false;
-      validators.isValidResponse('something').should.be.false;
-    });
-
-    it("rejects an argument that doesn't have a results key nested in it's 'body'", () => {
-      validators.isValidResponse({body: {}}).should.be.false;
-      validators.isValidResponse({body: null}).should.be.false;
-      validators.isValidResponse({body: 'something'}).should.be.false;
-    });
-
-    context("invalid 'results'", () => [
-      [['something', 'another thing'], 'an array with more than one element'],
-      [[], 'an empty array'],
-      ['something', 'a non-array']
-    ].forEach(([invalidResults, descriptorFragment]) => it(
-      `rejects an otherwise valid structure but with 'results' being ${descriptorFragment}`,
-      () => validators.isValidResponse({body: {results: invalidResults}}).should.be.false
-    )));
-
-    it("accepts an argument with a key of 'body' which has an object with a key of 'results' which is a single-element array", () => {
-      const validResults = ['something'];
-      validators.isValidResponse({body: {results: validResults}}).should.be.true;
-    });
-  });
-
   describe('isValidApiKey()', () => {
     it('accepts a non-empty string', () => {
       validators.isValidApiKey('SOME_KEY').should.be.true;
