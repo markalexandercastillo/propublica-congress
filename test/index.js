@@ -783,21 +783,37 @@ describe('pro-publica-congress', () => {
     });
 
     describe('.getVotes()', () => {
-      it.skip("performs a request to an endpoint resembling '{congress}/{chamber}/votes/{vote-type}'", () => {
+      it("performs a request to an endpoint resembling '{congress}/{chamber}/votes/{vote-type}'", () => {
         return ppc.getVotes('{chamber}', '{vote-type}')
           .then(() => ignoringVerify(client.get(
             '{congress}/{chamber}/votes/{vote-type}'
           )));
       });
 
-      it.skip("performs request to an endpoint respecting the given congress", () => {
+      it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getVotes('{chamber}', '{vote-type}', {congress: '{different-congress}'})
           .then(() => ignoringVerify(client.get(
             '{different-congress}/{chamber}/votes/{vote-type}'
           )));
       });
 
-      it.skip('rejects with an invalid congress', () => {
+      it('validates against the 102nd congress as the earliest for the house', () => {
+        return ppc.getVotes('house', '{vote-type}')
+          .then(() => verify(validators.isValidCongress(
+            anything(),
+            102
+          )));
+      });
+
+      it('validates against the 101st congress as the earliest for the senate', () => {
+        return ppc.getVotes('senate', '{vote-type}')
+          .then(() => verify(validators.isValidCongress(
+            anything(),
+            101
+          )));
+      });
+
+      it('rejects with an invalid congress', () => {
         ignoringWhen(validators.isValidCongress('{invalid-congress}'))
           .thenReturn(false);
 
@@ -805,7 +821,7 @@ describe('pro-publica-congress', () => {
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
 
-      it.skip('rejects with an invalid chamber', () => {
+      it('rejects with an invalid chamber', () => {
         when(validators.isValidChamber('{invalid-chamber}'))
           .thenReturn(false);
 
@@ -813,7 +829,7 @@ describe('pro-publica-congress', () => {
           .should.be.rejectedWith(Error, 'Received invalid chamber:');
       });
 
-      it.skip('validates against vote types', () => {
+      it('validates against vote types', () => {
         const expectedTypes = new Set([
           'missed',
           'party',
@@ -827,7 +843,7 @@ describe('pro-publica-congress', () => {
           )));
       });
 
-      it.skip('rejects with an invalid vote type', () => {
+      it('rejects with an invalid vote type', () => {
         ignoringWhen(validators.isValidType('{invalid-vote-type}'))
           .thenReturn(false);
 
@@ -835,16 +851,16 @@ describe('pro-publica-congress', () => {
           .should.be.rejectedWith(Error, 'Received invalid vote type:');
       });
 
-      it.skip('sets the offset to 0 by default', () => {
-        return ppc.getBillsByMember('{member-id}', '{member-bill-type}')
+      it('sets the offset to 0 by default', () => {
+        return ppc.getVotes('{chamber}', '{vote-type}')
           .then(() => verify(client.get(
             anything(),
             0
           )));
       });
 
-      it.skip('sets the given offset', () => {
-        return ppc.getBillsByMember('{member-id}', '{member-bill-type}', {offset: '{offset}'})
+      it('sets the given offset', () => {
+        return ppc.getVotes('{chamber}', '{vote-type}', {offset: '{offset}'})
           .then(() => verify(client.get(
             anything(),
             '{offset}'
@@ -853,21 +869,21 @@ describe('pro-publica-congress', () => {
     });
 
     describe('.getSenateNominationVotes()', () => {
-      it.skip("performs a request to an endpoint resembling '{congress}/nominations'", () => {
+      it("performs a request to an endpoint resembling '{congress}/nominations'", () => {
         return ppc.getSenateNominationVotes()
           .then(() => ignoringVerify(client.get(
             '{congress}/nominations'
           )));
       });
 
-      it.skip("performs request to an endpoint respecting the given congress", () => {
+      it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getSenateNominationVotes({congress: '{different-congress}'})
           .then(() => ignoringVerify(client.get(
             '{different-congress}/nominations'
           )));
       });
 
-      it.skip('validates against the 101st congress as the earliest', () => {
+      it('validates against the 101st congress as the earliest', () => {
         return ppc.getSenateNominationVotes()
           .then(() => verify(validators.isValidCongress(
             anything(),
@@ -875,7 +891,7 @@ describe('pro-publica-congress', () => {
           )));
       });
 
-      it.skip('rejects with an invalid congress', () => {
+      it('rejects with an invalid congress', () => {
         ignoringWhen(validators.isValidCongress('{invalid-congress}'))
           .thenReturn(false);
 
@@ -883,7 +899,7 @@ describe('pro-publica-congress', () => {
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
 
-      it.skip('sets the offset to 0 by default', () => {
+      it('sets the offset to 0 by default', () => {
         return ppc.getSenateNominationVotes()
           .then(() => verify(client.get(
             anything(),
@@ -891,7 +907,7 @@ describe('pro-publica-congress', () => {
           )));
       });
 
-      it.skip('sets the given offset', () => {
+      it('sets the given offset', () => {
         return ppc.getSenateNominationVotes({offset: '{offset}'})
           .then(() => verify(client.get(
             anything(),
