@@ -73,6 +73,21 @@ function validateMemberId(memberId) {
 
 const proto = {
   /**
+   * Resolves to a list of members who have left the Senate or House or have announced plans to do
+   * so.
+   * 
+   * @see https://propublica.github.io/congress-api-docs/#get-members-leaving-office
+   * @param {String} chamber 
+   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @returns {Promise}
+   */
+  getLeavingMembers(chamber, {congress = this.congress, offset = 0} = {}) {
+    return Promise.all([
+      validateCongress(congress, 111),
+      validateChamber(chamber)
+    ]).then(() => this.client.get(`${congress}/${chamber}/members/leaving`, offset));
+  },
+  /**
    * You can get vote information in four categories: missed votes, party votes, lone no votes and
    * perfect votes. Missed votes provides information about the voting attendance of each member of
    * a specific chamber and congress. Party votes provides information about how often each member
