@@ -59,6 +59,19 @@ function validateMemberId(memberId) {
 
 const proto = {
   /**
+   * Resolves to a list of Senate or House committees.
+   * @see https://propublica.github.io/congress-api-docs/#get-committees-and-committee-memberships
+   * @param {String} chamber 
+   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @returns {Promise}
+   */
+  getCommittees(chamber, {congress = this.congress, offset = 0} = {}) {
+    return Promise.all([
+      validateCongress(congress, 110),
+      validateChamber(chamber)
+    ]).then(() => this.client.get(`${congress}/${chamber}/committees`, offset));
+  },
+  /**
    * Resolves to a comparison of bill sponsorship or vote positions between two members who served
    * in the same Congress and chamber.
    * 

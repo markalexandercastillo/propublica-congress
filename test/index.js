@@ -1004,21 +1004,21 @@ describe('pro-publica-congress', () => {
     });
 
     describe('.getCommittees()', () => {
-      it.skip("performs a request to an endpoint resembling '{congress}/{chamber}/committees'", () => {
+      it("performs a request to an endpoint resembling '{congress}/{chamber}/committees'", () => {
         return ppc.getCommittees('{chamber}')
           .then(() => ignoringVerify(client.get(
             '{congress}/{chamber}/committees'
           )));
       });
 
-      it.skip("performs request to an endpoint respecting the given congress", () => {
+      it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getCommittees('{chamber}', {congress: '{different-congress}'})
           .then(() => ignoringVerify(client.get(
             '{different-congress}/{chamber}/committees'
           )));
       });
     
-      it.skip('validates against the 110th congress as the earliest', () => {
+      it('validates against the 110th congress as the earliest', () => {
         return ppc.getCommittees('{chamber}')
           .then(() => verify(validators.isValidCongress(
             anything(),
@@ -1026,7 +1026,7 @@ describe('pro-publica-congress', () => {
           )));
       });
     
-      it.skip('rejects with an invalid congress', () => {
+      it('rejects with an invalid congress', () => {
         ignoringWhen(validators.isValidCongress('{invalid-congress}'))
           .thenReturn(false);
 
@@ -1034,7 +1034,7 @@ describe('pro-publica-congress', () => {
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
     
-      it.skip('rejects with an invalid chamber', () => {
+      it('rejects with an invalid chamber', () => {
         when(validators.isValidChamber('{invalid-chamber}'))
           .thenReturn(false);
 
@@ -1042,7 +1042,7 @@ describe('pro-publica-congress', () => {
           .should.be.rejectedWith(Error, 'Received invalid chamber:');
       });
 
-      it.skip('sets the offset to 0 by default', () => {
+      it('sets the offset to 0 by default', () => {
         return ppc.getCommittees('{chamber}')
           .then(() => verify(client.get(
             anything(),
@@ -1050,7 +1050,7 @@ describe('pro-publica-congress', () => {
           )));
       });
 
-      it.skip('sets the given offset', () => {
+      it('sets the given offset', () => {
         return ppc.getCommittees('{chamber}', {offset: '{offset}'})
           .then(() => verify(client.get(
             anything(),
