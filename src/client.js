@@ -28,7 +28,7 @@ const proto = {
     return http.get(
       `${HOST}/congress/v${VERSION}/${endpoint}.json`,
       assign({headers, json: true}, {body})
-    );
+    ).then(({body}) => body);
   }
 };
 

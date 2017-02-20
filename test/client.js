@@ -102,5 +102,12 @@ describe('client', () => {
       return client.get('some/endpoint', 'an invalid offset')
         .should.be.rejectedWith(Error, 'Received invalid offset:');
     });
+
+    it("resolves to the value of the 'body' key", () => {
+      ignoringWhen(http.get())
+        .thenResolve({body: 'some body data'});
+
+      return client.get('some/endpoint').should.become('some body data');
+    });
   });
 });
