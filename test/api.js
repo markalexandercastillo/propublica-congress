@@ -8,8 +8,8 @@ const {replace, when, verify, matchers: {
 require('chai').use(require('chai-as-promised')).should();
 
 // aliases to verify and when with the ignoreExtraArgs config option set to true
-const ignoringWhen = fakeInvocation => when(fakeInvocation, {ignoreExtraArgs: true});
-const ignoringVerify = fakeInvocation => verify(fakeInvocation, {ignoreExtraArgs: true});
+const looseWhen = fakeInvocation => when(fakeInvocation, {ignoreExtraArgs: true});
+const looseVerify = fakeInvocation => verify(fakeInvocation, {ignoreExtraArgs: true});
 
 describe('api', () => {
   let http, createApi, validators;
@@ -19,10 +19,10 @@ describe('api', () => {
     createApi = require('./../src/api').create;
 
     // validation invocations pass by default
-    ignoringWhen(validators.isValidOffset())
+    looseWhen(validators.isValidOffset())
       .thenReturn(true);
 
-    ignoringWhen(validators.isValidApiKey())
+    looseWhen(validators.isValidApiKey())
       .thenReturn(true);
   });
 
@@ -46,7 +46,7 @@ describe('api', () => {
     beforeEach(() => {
       api = createApi('SOME_KEY');
 
-      ignoringWhen(http.get())
+      looseWhen(http.get())
         .thenResolve({});
     });
 
@@ -76,21 +76,21 @@ describe('api', () => {
 
     it("performs the request to the ProPublica API host", () => {
       return api.get('some/endpoint')
-        .then(() => ignoringVerify(http.get(
+        .then(() => looseVerify(http.get(
           argThat(url => url.indexOf('https://api.propublica.org') === 0)
         )));
     });
 
     it("performs the request to version 1 of ProPublica's Congres API", () => {
       return api.get('some/endpoint')
-        .then(() => ignoringVerify(http.get(
+        .then(() => looseVerify(http.get(
           argThat(url => URL.parse(url).path.indexOf('/congress/v1/') === 0)
         )));
     });
 
     it("performs the request to the JSON variant of the endpoint", () => {
       return api.get('some/endpoint')
-        .then(() => ignoringVerify(http.get(
+        .then(() => looseVerify(http.get(
           argThat(url => url.substr(-'some/endpoint.json'.length) === 'some/endpoint.json')
         )));
     });
@@ -104,7 +104,7 @@ describe('api', () => {
     });
 
     it("resolves to the value of the 'body' key", () => {
-      ignoringWhen(http.get())
+      looseWhen(http.get())
         .thenResolve({body: 'some body data'});
 
       return api.get('some/endpoint').should.become('some body data');
