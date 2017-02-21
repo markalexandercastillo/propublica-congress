@@ -3,44 +3,6 @@ const {create, assign, keys} = Object
   , client = require('./client')
   , validators = require('./validators');
 
-const recentBillTypes = [
-  'introduced',
-  'updated',
-  'passed',
-  'major'
-];
-
-const additionalBillDetailTypes = [
-  'subjects',
-  'amendments',
-  'related',
-  'cosponsors'
-];
-
-const memberComparisonTypes = [
-  'bills',
-  'votes'
-];
-
-const nomineeTypes = [
-  'received',
-  'updated',
-  'confirmed',
-  'withdrawn'
-];
-
-const voteTypes = [
-  'missed',
-  'party',
-  'loneno',
-  'perfect'
-];
-
-const memberBillTypes = [
-  'introduced',
-  'updated'
-];
-
 /**
  * Creates a new object with promise-based versions of the validator functions
  * which take the same arguments (with the exception of the corresponding function
@@ -82,6 +44,43 @@ const validate =
       });
     }, {});
 
+const recentBillTypes = [
+  'introduced',
+  'updated',
+  'passed',
+  'major'
+];
+
+const additionalBillDetailTypes = [
+  'subjects',
+  'amendments',
+  'related',
+  'cosponsors'
+];
+
+const memberComparisonTypes = [
+  'bills',
+  'votes'
+];
+
+const nomineeTypes = [
+  'received',
+  'updated',
+  'confirmed',
+  'withdrawn'
+];
+
+const voteTypes = [
+  'missed',
+  'party',
+  'loneno',
+  'perfect'
+];
+
+const memberBillTypes = [
+  'introduced',
+  'updated'
+];
 
 const proto = {
   /**
