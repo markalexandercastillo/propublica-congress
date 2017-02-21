@@ -138,7 +138,7 @@ function isValidRollCallNumber(rollCallNumber) {
  * @returns {Boolean}
  */
 function isValidYear(year) {
-  return /(19|20)\d\d/.test(year)
+  return /(19|20)\d\d/.test(year);
 }
 
 /**
