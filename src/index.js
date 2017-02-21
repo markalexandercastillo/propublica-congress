@@ -71,7 +71,47 @@ function validateMemberId(memberId) {
   );
 }
 
+function validateState(state) {
+  return new Promise((resolve, reject) => validators.isValidState(state)
+    ? resolve()
+    : reject(new Error(`Received invalid state: ${stringify(state)}`))
+  );
+}
+
+function validateDistrict(district) {
+  return new Promise((resolve, reject) => validators.isValidDistrict(district)
+    ? resolve()
+    : reject(new Error(`Received invalid district: ${stringify(district)}`))
+  );
+}
+
 const proto = {
+  /**
+   * Resolves to the current members of the house of representatives for the given state and
+   * district
+   * 
+   * @see https://propublica.github.io/congress-api-docs/#get-current-members-by-state-district
+   * @param {String} state 
+   * @param {Number} district 
+   * @returns {Promise}
+   */
+  getCurrentRepresentatives(state, district) {
+    return Promise.all([
+      validateState(state),
+      validateDistrict(district)
+    ]).then(() => this.client.get(`members/house/${state}/${district}/current`));
+  },
+  /**
+   * Resolves to the current members of the senate for the given state
+   * 
+   * @see https://propublica.github.io/congress-api-docs/#get-current-members-by-state-district
+   * @param {any} state 
+   * @returns {Promise}
+   */
+  getCurrentSenators(state) {
+    return validateState(state)
+      .then(() => this.client.get(`members/senate/${state}/current`));
+  },
   /**
    * Resolves to a list of members who have left the Senate or House or have announced plans to do
    * so.

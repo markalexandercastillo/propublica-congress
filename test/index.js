@@ -477,34 +477,34 @@ describe('pro-publica-congress', () => {
     });
 
     describe('.getCurrentSenators()', () => {
-      it.skip("performs a request to an endpoint resembling 'members/senate/{state}/current'", () => {
+      it("performs a request to an endpoint resembling 'members/senate/{state}/current'", () => {
         return ppc.getCurrentSenators('{state}')
           .then(() => ignoringVerify(client.get(
             'members/senate/{state}/current'
           )));
       });
 
-      it.skip('rejects with an invalid state', () => {
+      it('rejects with an invalid state', () => {
         return ppc.getCurrentSenators('{invalid-state}')
           .should.be.rejectedWith(Error, 'Received invalid state:');
       });
     });
 
     describe('.getCurrentRepresentatives()', () => {
-      it.skip("performs a request to an endpoint resembling 'members/house/{state}/{district}/current'", () => {
-        return ppc.getCurrentSenators('{state}', '{district}')
+      it("performs a request to an endpoint resembling 'members/house/{state}/{district}/current'", () => {
+        return ppc.getCurrentRepresentatives('{state}', '{district}')
           .then(() => ignoringVerify(client.get(
             'members/house/{state}/{district}/current'
           )));
       });
 
-      it.skip('rejects with an invalid state', () => {
-        return ppc.getCurrentSenators('{invalid-state}', '{district}')
+      it('rejects with an invalid state', () => {
+        return ppc.getCurrentRepresentatives('{invalid-state}', '{district}')
           .should.be.rejectedWith(Error, 'Received invalid state:');
       });
 
-      it.skip('rejects with an invalid district', () => {
-        return ppc.getCurrentSenators('{state}', '{invalid-district}')
+      it('rejects with an invalid district', () => {
+        return ppc.getCurrentRepresentatives('{state}', '{invalid-district}')
           .should.be.rejectedWith(Error, 'Received invalid district:');
       });
     });
