@@ -36,6 +36,11 @@ const voteTypes = new Set([
   'perfect'
 ]);
 
+const memberBillTypes = new Set([
+  'introduced',
+  'updated'
+]);
+
 function validateChamber(chamber) {
   return new Promise((resolve, reject) => validators.isValidChamber(chamber)
     ? resolve()
@@ -85,7 +90,121 @@ function validateDistrict(district) {
   );
 }
 
+function validateSessionNumber(sessionNumber) {
+  return new Promise((resolve, reject) => validators.isValidSessionNumber(sessionNumber)
+    ? resolve()
+    : reject(new Error(`Received invalid session number: ${stringify(sessionNumber)}`))
+  );
+}
+
+function validateRollCallNumber(rollCallNumber) {
+  return new Promise((resolve, reject) => validators.isValidRollCallNumber(rollCallNumber)
+    ? resolve()
+    : reject(new Error(`Received invalid roll call number: ${stringify(rollCallNumber)}`))
+  );
+}
+
+function validateYear(year) {
+  return new Promise((resolve, reject) => validators.isValidYear(year)
+    ? resolve()
+    : reject(new Error(`Received invalid year: ${stringify(year)}`))
+  );
+}
+
+function validateMonth(month) {
+  return new Promise((resolve, reject) => validators.isValidMonth(month)
+    ? resolve()
+    : reject(new Error(`Received invalid month: ${stringify(month)}`))
+  );
+}
+
+function validateCommitteeId(committeeId) {
+  return new Promise((resolve, reject) => validators.isValidCommitteeId(committeeId)
+    ? resolve()
+    : reject(new Error(`Received invalid committee ID: ${stringify(committeeId)}`))
+  );
+}
+
 const proto = {
+  /**
+   * Resolves to the members of a particular committee
+   * 
+   * @see https://propublica.github.io/congress-api-docs/#get-committees-and-committee-memberships
+   * @param {String} chamber 
+   * @param {String} committeeId 
+   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @returns {Promise}
+   */
+  getCommitteeMembers(chamber, committeeId, {congress = this.congress, offset = 0} = {}) {
+    return Promise.all([
+      validateChamber(chamber),
+      validateCongress(congress, 110),
+      validateCommitteeId(committeeId)
+    ]).then(() => this.client.get(`${congress}/${chamber}/committees/${committeeId}`, offset));
+  },
+  /**
+   * Resolves to a list of presidential civilian nominations of individuals from a specific state.
+   *
+   * @see https://propublica.github.io/congress-api-docs/#get-nominees-by-state
+   * @param {String} state
+   * @param {Object} [{congress = this.congress}={}] 
+   * @returns {Promise}
+   */
+  getNomineesByState(state, {congress = this.congress} = {}) {
+    return Promise.all([
+      validateState(state),
+      validateCongress(congress, 107)
+    ]).then(() => this.client.get(`${congress}/nominees/state/${state}`));
+  },
+  /**
+   * Resolves to all votes in a particular month.
+   * 
+   * @see https://propublica.github.io/congress-api-docs/#get-votes-by-date
+   * @param {String} chamber 
+   * @param {String} year 
+   * @param {String} month 
+   * @returns {Promise}
+   */
+  getVotesByDate(chamber, year, month) {
+    return Promise.all([
+      validateChamber(chamber),
+      validateYear(year),
+      validateMonth(month)
+    ]).then(() => this.client.get(`${chamber}/votes/${year}/${month}`))
+  },
+  /**
+   * Resolves to a specific roll-call vote, including a complete list of member positions.
+   * 
+   * @see https://propublica.github.io/congress-api-docs/#get-a-specific-roll-call-vote
+   * @param {String} chamber 'senate' or 'house'
+   * @param {Number} sessionNumber 1 or 2
+   * @param {Number} rollCallNumber 
+   * @param {Object} [{congress = this.congress}={}] 
+   * @returns {Promise}
+   */
+  getRollCallVotes(chamber, sessionNumber, rollCallNumber, {congress = this.congress} = {}) {
+    return Promise.all([
+      validateRollCallNumber(rollCallNumber),
+      validateSessionNumber(sessionNumber),
+      validateChamber(chamber).then(() => validateCongress(congress, {house: 102, senate: 101}[chamber]))
+    ]).then(() => this.client.get(`${congress}/${chamber}/sessions/${sessionNumber}/votes/${rollCallNumber}`));
+  },
+  /**
+   * Resolves to the 20 bills most recently introduced or updated by a particular member. Results
+   * can include more than one Congress.
+   * 
+   * @see https://propublica.github.io/congress-api-docs/#get-recent-bills-by-a-specific-member
+   * @param {String} memberId 
+   * @param {String} memberBillType 'introduced' or 'updated'
+   * @param {Object} [{offset = 0}={}] 
+   * @returns {Promise}
+   */
+  getBillsByMember(memberId, memberBillType, {offset = 0} = {}) {
+    return Promise.all([
+      validateMemberId(memberId),
+      validateType(memberBillType, memberBillTypes, 'member bill type')
+    ]).then(() => this.client.get(`members/${memberId}/bills/${memberBillType}`, offset));
+  },
   /**
    * Resolves to the current members of the house of representatives for the given state and
    * district
