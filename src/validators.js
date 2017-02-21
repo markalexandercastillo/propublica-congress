@@ -1,9 +1,10 @@
 /**
  * Exports validation utility functions used throughout this library. They're primarily intended
- * for minimizing unnecessary API calls
+ * for minimizing unnecessary API calls so some aren't very strict
  */
 
-const states = require('./states');
+const states = require('./states')
+  , CURRENT_CONGRESS = require('./CURRENT_CONGRESS');
 
 /**
  * Whether the argument is a valid offset to send to the ProPublica API
@@ -38,7 +39,6 @@ function isValidChamber(chamber) {
   ]);
 }
 
-const CURRENT_SESSION = 115;
 
 /**
  * Whether the given session of congress is valid
@@ -51,8 +51,8 @@ function isValidCongress(session, earliestSession) {
   if (parseInt(session) != session) return false;
   if (earliestSession && parseInt(earliestSession) != earliestSession) return false;
   return earliestSession
-    ? session <= CURRENT_SESSION && session >= earliestSession
-    : session <= CURRENT_SESSION;
+    ? session <= CURRENT_CONGRESS && session >= earliestSession
+    : session <= CURRENT_CONGRESS;
 }
 
 /**

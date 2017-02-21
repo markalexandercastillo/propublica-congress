@@ -1,7 +1,8 @@
 const {create, assign, keys} = Object
   , {stringify} = JSON
   , api = require('./api')
-  , validators = require('./validators');
+  , validators = require('./validators')
+  , CURRENT_CONGRESS = require('./CURRENT_CONGRESS');
 
 /**
  * Creates a new object with promise-based versions of the validator functions
@@ -385,7 +386,7 @@ const proto = {
 };
 
 module.exports = {
-  create(key, congress) {
+  create(key, congress = CURRENT_CONGRESS) {
     if (congress && !validators.isValidCongress(congress)) {
       throw new Error(`Received invalid congress: ${stringify(congress)}`);
     }

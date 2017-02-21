@@ -1,7 +1,8 @@
 const {replace, when, verify, object, matchers: {
   anything,
   argThat
-}} = require('testdouble');
+}} = require('testdouble')
+  , CURRENT_CONGRESS = require('./../src/CURRENT_CONGRESS');
 
 require('chai').use(require('chai-as-promised')).should();
 
@@ -34,6 +35,11 @@ describe('pro-publica-congress', () => {
     it(
       "sets a 'congress' property to the given argument",
       () => createPpc('PROPUBLICA_API_KEY', '{congress}').congress.should.equal('{congress}')
+    );
+
+    it(
+      'uses the current congress by default',
+      () => createPpc('PROPUBLICA_API_KEY').congress.should.equal(CURRENT_CONGRESS)
     );
 
     it('throws with an invalid congress', () => {
