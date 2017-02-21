@@ -1,5 +1,6 @@
 const {replace, when, verify, object, matchers: {
-  anything
+  anything,
+  argThat
 }} = require('testdouble');
 
 require('chai').use(require('chai-as-promised')).should();
@@ -15,21 +16,17 @@ describe('pro-publica-congress', () => {
     validators = replace('./../src/validators');
     createPpc = require('./../src/index').create;
 
-    // validation invocations pass by default
-    ignoringWhen(validators.isValidCongress())
-      .thenReturn(true);
+    Object.keys(validators)
+      .filter(methodName => methodName.indexOf('isValid') === 0)
+      .forEach(methodName => {
+        // validation invocations pass by default
+        ignoringWhen(validators[methodName]())
+          .thenReturn(true);
 
-    ignoringWhen(validators.isValidChamber())
-      .thenReturn(true);
-
-    ignoringWhen(validators.isValidType())
-      .thenReturn(true);
-
-    ignoringWhen(validators.isValidBillId())
-      .thenReturn(true);
-    
-    ignoringWhen(validators.isValidMemberId())
-      .thenReturn(true);
+        // validation invocations with the first argument beginning with '{invalid-' will return false
+        ignoringWhen(validators[methodName](argThat(arg => `${arg}`.indexOf('{invalid-') > -1)))
+          .thenReturn(false);
+      });
   });
 
   describe('create()', () => {
@@ -39,9 +36,6 @@ describe('pro-publica-congress', () => {
     );
 
     it('throws with an invalid congress', () => {
-      when(validators.isValidCongress('{invalid-congress}'))
-        .thenReturn(false);
-
       (() => createPpc('PROPUBLICA_API_KEY', '{invalid-congress}'))
         .should.throw(Error, 'Received invalid congress:');
     });
@@ -101,17 +95,11 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid chamber', () => {
-        when(validators.isValidChamber('{invalid-chamber}'))
-          .thenReturn(false);
-
         return ppc.getRecentBills('{invalid-chamber}', '{recent-bill-type}')
           .should.be.rejectedWith(Error, 'Received invalid chamber:');
       });
 
       it('rejects with an invalid congress', () => {
-        ignoringWhen(validators.isValidCongress('{invalid-congress}'))
-          .thenReturn(false);
-
         return ppc.getRecentBills('{chamber}', '{recent-bill-type}', {congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
@@ -139,9 +127,6 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid recent bill type', () => {
-        ignoringWhen(validators.isValidType('{invalid-recent-bill-type}'))
-          .thenReturn(false);
-
         return ppc.getRecentBills('{chamber}', '{invalid-recent-bill-type}')
           .should.be.rejectedWith(Error, 'Received invalid recent bill type:');
       });
@@ -163,9 +148,6 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid congress', () => {
-        ignoringWhen(validators.isValidCongress('{invalid-congress}'))
-          .thenReturn(false);
-
         return ppc.getBill('{bill-id}', {congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
@@ -179,9 +161,6 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid bill ID', () => {
-        when(validators.isValidBillId('{invalid-bill-id}'))
-          .thenReturn(false);
-
         return ppc.getBill('{invalid-bill-id}')
           .should.be.rejectedWith(Error, 'Received invalid bill ID:');
       });
@@ -203,9 +182,6 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid congress', () => {
-        ignoringWhen(validators.isValidCongress('{invalid-congress}'))
-          .thenReturn(false);
-
         return ppc.getAdditionalBillDetails('{bill-id}', '{additional-bill-detail-type}', {congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
@@ -219,9 +195,6 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid bill ID', () => {
-        when(validators.isValidBillId('{invalid-bill-id}'))
-          .thenReturn(false);
-
         return ppc.getAdditionalBillDetails('{invalid-bill-id}', '{additional-bill-detail-type}')
           .should.be.rejectedWith(Error, 'Received invalid bill ID:');
       });
@@ -241,9 +214,6 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid recent bill type', () => {
-        ignoringWhen(validators.isValidType('{invalid-additional-bill-detail-type}'))
-          .thenReturn(false);
-
         return ppc.getAdditionalBillDetails('{bill-id}', '{invalid-additional-bill-detail-type}')
           .should.be.rejectedWith(Error, 'Received invalid additional bill detail type:');
       });
@@ -297,9 +267,6 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid chamber', () => {
-        when(validators.isValidChamber('{invalid-chamber}'))
-          .thenReturn(false);
-
         return ppc.getMemberList('{invalid-chamber}')
           .should.be.rejectedWith(Error, 'Received invalid chamber:');
       });
@@ -313,17 +280,11 @@ describe('pro-publica-congress', () => {
       });
 
       it('reject on house lists before the 102nd congress', () => {
-        when(validators.isValidCongress('{invalid-congress}', 102))
-          .thenReturn(false);
-
         return ppc.getMemberList('house', {congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
 
       it('reject on senate lists before the 80th congress', () => {
-        when(validators.isValidCongress('{invalid-congress}', 80))
-          .thenReturn(false);
-
         return ppc.getMemberList('senate', {congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
@@ -371,9 +332,6 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid member ID', () => {
-        when(validators.isValidMemberId('{invalid-member-id}'))
-          .thenReturn(false);
-
         return ppc.getVotesByMember('{invalid-member-id}')
           .should.be.rejectedWith(Error, 'Received invalid member ID:');
       });
@@ -460,25 +418,16 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid first member ID', () => {
-        when(validators.isValidMemberId('{invalid-member-id}'))
-          .thenReturn(false);
-
         return getMemberComparison({firstMemberId: '{invalid-member-id}'})
           .should.be.rejectedWith(Error, 'Received invalid member ID:');
       });
 
       it('rejects with an invalid second member ID', () => {
-        when(validators.isValidMemberId('{invalid-second-member-id}'))
-          .thenReturn(false);
-
         return getMemberComparison({secondMemberId: '{invalid-second-member-id}'})
           .should.be.rejectedWith(Error, 'Received invalid member ID:');
       });
 
       it('rejects with an invalid chamber', () => {
-        when(validators.isValidChamber('{invalid-chamber}'))
-          .thenReturn(false);
-
         return getMemberComparison({chamber: '{invalid-chamber}'})
           .should.be.rejectedWith(Error, 'Received invalid chamber:');
       });
@@ -500,17 +449,11 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with representative comparisons before the 102nd congress', () => {
-        when(validators.isValidCongress('{invalid-congress}', 102))
-          .thenReturn(false);
-
         return getMemberComparison({chamber: 'house', congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
 
       it('rejects with senator comparisons before the 101st congress', () => {
-        when(validators.isValidCongress('{invalid-congress}', 101))
-          .thenReturn(false);
-
         return getMemberComparison({chamber: 'senate', congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
@@ -528,9 +471,6 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid member comparison type', () => {
-        ignoringWhen(validators.isValidType('{invalid-member-comparison-type}'))
-          .thenReturn(false);
-
         return getMemberComparison({memberComparisonType: '{invalid-member-comparison-type}'})
           .should.be.rejectedWith(Error, 'Received invalid member comparison type:');
       });
@@ -545,9 +485,6 @@ describe('pro-publica-congress', () => {
       });
 
       it.skip('rejects with an invalid state', () => {
-        when(validators.isValidState('{invalid-state}'))
-          .thenReturn(false);
-
         return ppc.getCurrentSenators('{invalid-state}')
           .should.be.rejectedWith(Error, 'Received invalid state:');
       });
@@ -562,17 +499,11 @@ describe('pro-publica-congress', () => {
       });
 
       it.skip('rejects with an invalid state', () => {
-        when(validators.isValidState('{invalid-state}'))
-          .thenReturn(false);
-
         return ppc.getCurrentSenators('{invalid-state}', '{district}')
           .should.be.rejectedWith(Error, 'Received invalid state:');
       });
 
       it.skip('rejects with an invalid district', () => {
-        when(validators.isValidDistrict('{invalid-district}'))
-          .thenReturn(false);
-
         return ppc.getCurrentSenators('{state}', '{invalid-district}')
           .should.be.rejectedWith(Error, 'Received invalid district:');
       });
@@ -602,17 +533,11 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid congress', () => {
-        ignoringWhen(validators.isValidCongress('{invalid-congress}'))
-          .thenReturn(false);
-
         return ppc.getLeavingMembers('{invalid-congress}', {congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
 
       it('rejects with an invalid chamber', () => {
-        when(validators.isValidChamber('{invalid-chamber}'))
-          .thenReturn(false);
-
         return ppc.getLeavingMembers('{invalid-chamber}')
           .should.be.rejectedWith(Error, 'Received invalid chamber:');
       });
@@ -655,16 +580,10 @@ describe('pro-publica-congress', () => {
       });
 
       it.skip('rejects with an invalid member bill type', () => {
-        ignoringWhen(validators.isValidType('{invalid-member-bill-type}'))
-          .thenReturn(false);
-        
         return ppc.getBillsByMember('{member-id}', '{member-bill-type}');
       });
 
       it.skip('rejects with an invalid member ID', () => {
-        when(validators.isValidMemberId('{invalid-member-id}'))
-          .thenReturn(false);
-        
         return ppc.getBillsByMember('{invalid-member-id}', '{member-bill-type}');
       });
 
@@ -717,33 +636,21 @@ describe('pro-publica-congress', () => {
       });
 
       it.skip('rejects with an invalid congress', () => {
-        ignoringWhen(validators.isValidCongress('{invalid-congress}'))
-          .thenReturn(false);
-
         return ppc.getRollCallVotes('senate', '{session-number}', '{roll-call-number}', {congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
 
       it.skip('rejects with an invalid chamber', () => {
-        when(validators.isValidChamber('{invalid-chamber}'))
-          .thenReturn(false);
-
         return ppc.getRollCallVotes('{invalid-chamber}', '{session-number}', '{roll-call-number}')
           .should.be.rejectedWith(Error, 'Received invalid chamber:');
       });
 
       it.skip('rejects with an invalid session number', () => {
-        when(validators.isValidSessionNumber('{invalid-session-number}'))
-          .thenReturn(false);
-
         return ppc.getRollCallVotes('{chamber}', '{invalid-session-number}', '{roll-call-number}')
           .should.be.rejectedWith(Error, 'Received invalid session number:');
       });
 
       it.skip('rejects with an invalid roll call number', () => {
-        when(validators.isValidRollCallNumber('{invalid-roll-call-number}'))
-          .thenReturn(false);
-
         return ppc.getRollCallVotes('{chamber}', '{session-number}', '{invalid-roll-call-number}')
           .should.be.rejectedWith(Error, 'Received invalid roll call number:');
       });
@@ -758,25 +665,16 @@ describe('pro-publica-congress', () => {
       });
 
       it.skip('rejects with an invalid chamber', () => {
-        when(validators.isValidChamber('{invalid-chamber}'))
-          .thenReturn(false);
-
         return ppc.getVotesByDate('{invalid-chamber}', '{year}', '{month}')
           .should.be.rejectedWith(Error, 'Received invalid chamber:');
       });
 
       it.skip('rejects with an invalid year', () => {
-        when(validators.isValidYear('{invalid-year}'))
-          .thenReturn(false);
-
         return ppc.getVotesByDate('{chamber}', '{invalid-year}', '{month}')
           .should.be.rejectedWith(Error, 'Received invalid year: ');
       });
 
       it.skip('rejects with an invalid month', () => {
-        when(validators.isValidMonth('{invalid-month}'))
-          .thenReturn(false);
-
         return ppc.getVotesByDate('{chamber}', '{year}', '{invalid-month}')
           .should.be.rejectedWith(Error, 'Received invalid month: ');
       });
@@ -814,17 +712,11 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid congress', () => {
-        ignoringWhen(validators.isValidCongress('{invalid-congress}'))
-          .thenReturn(false);
-
         ppc.getVotes('{chamber}', '{vote-type}', {congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
 
       it('rejects with an invalid chamber', () => {
-        when(validators.isValidChamber('{invalid-chamber}'))
-          .thenReturn(false);
-
         return ppc.getVotes('{invalid-chamber}', '{vote-type}')
           .should.be.rejectedWith(Error, 'Received invalid chamber:');
       });
@@ -844,9 +736,6 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid vote type', () => {
-        ignoringWhen(validators.isValidType('{invalid-vote-type}'))
-          .thenReturn(false);
-
         return ppc.getVotes('{chamber}', '{invalid-vote-type}')
           .should.be.rejectedWith(Error, 'Received invalid vote type:');
       });
@@ -892,9 +781,6 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid congress', () => {
-        ignoringWhen(validators.isValidCongress('{invalid-congress}'))
-          .thenReturn(false);
-
         return ppc.getSenateNominationVotes({congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
@@ -940,9 +826,6 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid congress', () => {
-        ignoringWhen(validators.isValidCongress('{invalid-congress}'))
-          .thenReturn(false);
-
         return ppc.getNominees('{nominee-type}', {congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
@@ -962,9 +845,6 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid nominee type', () => {
-        ignoringWhen(validators.isValidType('{invalid-nominee-type}'))
-          .thenReturn(false);
-
         return ppc.getNominees('{invalid-nominee-type}')
           .should.be.rejectedWith(Error, 'Received invalid nominee type:');
       });
@@ -994,17 +874,11 @@ describe('pro-publica-congress', () => {
       });
 
       it.skip('rejects with an invalid congress', () => {
-        ignoringWhen(validators.isValidCongress('{invalid-congress}'))
-          .thenReturn(false);
-
         return ppc.getNomineesByState('{state}', {congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
 
       it.skip('rejects with an invalid state', () => {
-        when(validators.isValidState('{invalid-state}'))
-          .thenReturn(false);
-
         return ppc.getNomineesByState('{invalid-state}')
           .should.be.rejectedWith(Error, 'Received invalid state:');
       });
@@ -1043,17 +917,11 @@ describe('pro-publica-congress', () => {
       });
     
       it('rejects with an invalid congress', () => {
-        ignoringWhen(validators.isValidCongress('{invalid-congress}'))
-          .thenReturn(false);
-
         return ppc.getCommittees('{chamber}', {congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
     
       it('rejects with an invalid chamber', () => {
-        when(validators.isValidChamber('{invalid-chamber}'))
-          .thenReturn(false);
-
         return ppc.getCommittees('{invalid-chamber}')
           .should.be.rejectedWith(Error, 'Received invalid chamber:');
       });
@@ -1099,25 +967,16 @@ describe('pro-publica-congress', () => {
       });
 
       it.skip('rejects with an invalid congress', () => {
-        ignoringWhen(validators.isValidCongress('{invalid-congress}'))
-          .thenReturn(false);
-
         return ppc.getCommitteeMembers('{chamber}', '{committee-id}', {congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
 
       it.skip('rejects with an invalid chamber', () => {
-        when(validators.isValidChamber('{invalid-chamber}'))
-          .thenReturn(false);
-
         return ppc.getCommitteeMembers('{invalid-chamber}', '{committee-id}')
           .should.be.rejectedWith(Error, 'Received invalid chamber:');
       });
 
       it.skip('rejects with an invalid committee ID', () => {
-        when(validators.isValidCommitteeId('{invalid-committee-id}'))
-          .thenReturn(false);
-
         return ppc.getCommitteeMembers('{chamber}', '{invalid-committee-id}')
           .should.be.rejectedWith(Error, 'Received invalid committee ID:');
       });
