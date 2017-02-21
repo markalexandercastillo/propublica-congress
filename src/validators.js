@@ -3,7 +3,7 @@
  * for minimizing unnecessary API calls
  */
 
-const statesArray = require('./states');
+const states = require('./states');
 
 /**
  * Whether the argument is a valid offset to send to the ProPublica API
@@ -15,21 +15,16 @@ function isValidOffset(offset) {
 }
 
 /**
- * Whether the given type is in the given typeSet
+ * Whether the given type is in the given types array
  * @param  {String}  type
- * @param  {Set}     [typeSet={}] A Set of types to validate against
+ * @param  {Array}   [types=[]] An array of types to validate against
  * @return {Boolean}
  */
-function isValidType(type, typeSet = new Set([])) {
+function isValidType(type, types = []) {
   return !!type
     && !!type.length
-    && typeSet.has(type);
+    && types.indexOf(type) > -1;
 }
-
-const chamberTypes = new Set([
-  'senate',
-  'house'
-]);
 
 /**
  * Whether the given string is a valid chamber of congress
@@ -37,7 +32,10 @@ const chamberTypes = new Set([
  * @return {Boolean}
  */
 function isValidChamber(chamber) {
-  return isValidType(chamber, chamberTypes);
+  return isValidType(chamber, [
+    'senate',
+    'house'
+  ]);
 }
 
 const CURRENT_SESSION = 115;
@@ -86,8 +84,6 @@ function isValidMemberId(memberId) {
   return !!(memberId && memberId.match)
     && !!(match = memberId.match(/[A-Z]\d{6}/)) && !!match && match[0] === memberId;
 }
-
-const states = new Set(statesArray);
 
 /**
  * Whether the given state is a US state with representation in congress and may be used with API

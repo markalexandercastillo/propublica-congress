@@ -114,16 +114,15 @@ describe('pro-publica-congress', () => {
       });
 
       it('validates against recent bill types', () => {
-        const expectedTypeSet = new Set([
-          'introduced',
-          'updated',
-          'passed',
-          'major'
-        ]);
         return ppc.getRecentBills('{chamber}', '{recent-bill-type}')
           .then(() => verify(validators.isValidType(
             '{recent-bill-type}',
-            expectedTypeSet
+            [
+              'introduced',
+              'updated',
+              'passed',
+              'major'
+            ]
           )));
       });
 
@@ -201,16 +200,15 @@ describe('pro-publica-congress', () => {
       });
 
       it('validates against recent bill types', () => {
-        const expectedAdditionalBillDetailTypes = new Set([
-          'subjects',
-          'amendments',
-          'related',
-          'cosponsors'
-        ]);
         return ppc.getAdditionalBillDetails('{bill-id}', '{additional-bill-detail-type}')
           .then(() => verify(validators.isValidType(
             '{additional-bill-detail-type}',
-            expectedAdditionalBillDetailTypes
+            [
+              'subjects',
+              'amendments',
+              'related',
+              'cosponsors'
+            ]
           )));
       });
 
@@ -460,14 +458,13 @@ describe('pro-publica-congress', () => {
       });
 
       it('validates against member comparison types', () => {
-        const expectedTypeSet = new Set([
-          'bills',
-          'votes',
-        ]);
         return getMemberComparison()
           .then(() => verify(validators.isValidType(
             '{member-comparison-type}',
-            expectedTypeSet
+            [
+              'bills',
+              'votes',
+            ]
           )));
       });
 
@@ -569,14 +566,13 @@ describe('pro-publica-congress', () => {
       });
 
       it('validates against member bill types', () => {
-        const expectedTypes = new Set([
-          'introduced',
-          'updated'
-        ]);
         return ppc.getBillsByMember('{member-id}', '{member-bill-type}')
           .then(() => verify(validators.isValidType(
             '{member-bill-type}',
-            expectedTypes
+            [
+              'introduced',
+              'updated'
+            ]
           )));
       });
 
@@ -725,16 +721,15 @@ describe('pro-publica-congress', () => {
       });
 
       it('validates against vote types', () => {
-        const expectedTypes = new Set([
-          'missed',
-          'party',
-          'loneno',
-          'perfect'
-        ]);
         return ppc.getVotes('{chamber}', '{vote-type}')
           .then(() => verify(validators.isValidType(
             '{vote-type}',
-            expectedTypes
+            [
+              'missed',
+              'party',
+              'loneno',
+              'perfect'
+            ]
           )));
       });
 
@@ -834,16 +829,15 @@ describe('pro-publica-congress', () => {
       });
 
       it('validates against nominee types', () => {
-        const expectedTypes = new Set([
-          'received',
-          'updated',
-          'confirmed',
-          'withdrawn'
-        ]);
         return ppc.getNominees('{nominee-type}')
           .then(() => verify(validators.isValidType(
             '{nominee-type}',
-            expectedTypes
+            [
+              'received',
+              'updated',
+              'confirmed',
+              'withdrawn'
+            ]
           )));
       });
 

@@ -3,43 +3,43 @@ const {create, assign, keys} = Object
   , client = require('./client')
   , validators = require('./validators');
 
-const recentBillTypes = new Set([
+const recentBillTypes = [
   'introduced',
   'updated',
   'passed',
   'major'
-]);
+];
 
-const additionalBillDetailTypes = new Set([
+const additionalBillDetailTypes = [
   'subjects',
   'amendments',
   'related',
   'cosponsors'
-]);
+];
 
-const memberComparisonTypes = new Set([
+const memberComparisonTypes = [
   'bills',
   'votes'
-]);
+];
 
-const nomineeTypes = new Set([
+const nomineeTypes = [
   'received',
   'updated',
   'confirmed',
   'withdrawn'
-]);
+];
 
-const voteTypes = new Set([
+const voteTypes = [
   'missed',
   'party',
   'loneno',
   'perfect'
-]);
+];
 
-const memberBillTypes = new Set([
+const memberBillTypes = [
   'introduced',
   'updated'
-]);
+];
 
 /**
  * Creates a new object with promise-based versions of the validator functions
