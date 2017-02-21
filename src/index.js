@@ -85,11 +85,11 @@ const memberBillTypes = [
 const proto = {
   /**
    * Resolves to the members of a particular committee
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-committees-and-committee-memberships
-   * @param {String} chamber 
-   * @param {String} committeeId 
-   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @param {String} chamber
+   * @param {String} committeeId
+   * @param {Object} [{congress = this.congress, offset = 0}={}]
    * @returns {Promise}
    */
   getCommitteeMembers(chamber, committeeId, {congress = this.congress, offset = 0} = {}) {
@@ -104,7 +104,7 @@ const proto = {
    *
    * @see https://propublica.github.io/congress-api-docs/#get-nominees-by-state
    * @param {String} state
-   * @param {Object} [{congress = this.congress}={}] 
+   * @param {Object} [{congress = this.congress}={}]
    * @returns {Promise}
    */
   getNomineesByState(state, {congress = this.congress} = {}) {
@@ -115,11 +115,11 @@ const proto = {
   },
   /**
    * Resolves to all votes in a particular month.
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-votes-by-date
-   * @param {String} chamber 
-   * @param {String} year 
-   * @param {String} month 
+   * @param {String} chamber
+   * @param {String} year
+   * @param {String} month
    * @returns {Promise}
    */
   getVotesByDate(chamber, year, month) {
@@ -131,12 +131,12 @@ const proto = {
   },
   /**
    * Resolves to a specific roll-call vote, including a complete list of member positions.
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-a-specific-roll-call-vote
    * @param {String} chamber 'senate' or 'house'
    * @param {Number} sessionNumber 1 or 2
-   * @param {Number} rollCallNumber 
-   * @param {Object} [{congress = this.congress}={}] 
+   * @param {Number} rollCallNumber
+   * @param {Object} [{congress = this.congress}={}]
    * @returns {Promise}
    */
   getRollCallVotes(chamber, sessionNumber, rollCallNumber, {congress = this.congress} = {}) {
@@ -149,11 +149,11 @@ const proto = {
   /**
    * Resolves to the 20 bills most recently introduced or updated by a particular member. Results
    * can include more than one Congress.
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-recent-bills-by-a-specific-member
-   * @param {String} memberId 
+   * @param {String} memberId
    * @param {String} memberBillType 'introduced' or 'updated'
-   * @param {Object} [{offset = 0}={}] 
+   * @param {Object} [{offset = 0}={}]
    * @returns {Promise}
    */
   getBillsByMember(memberId, memberBillType, {offset = 0} = {}) {
@@ -165,10 +165,10 @@ const proto = {
   /**
    * Resolves to the current members of the house of representatives for the given state and
    * district
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-current-members-by-state-district
-   * @param {String} state 
-   * @param {Number} district 
+   * @param {String} state
+   * @param {Number} district
    * @returns {Promise}
    */
   getCurrentRepresentatives(state, district) {
@@ -179,9 +179,9 @@ const proto = {
   },
   /**
    * Resolves to the current members of the senate for the given state
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-current-members-by-state-district
-   * @param {any} state 
+   * @param {any} state
    * @returns {Promise}
    */
   getCurrentSenators(state) {
@@ -191,10 +191,10 @@ const proto = {
   /**
    * Resolves to a list of members who have left the Senate or House or have announced plans to do
    * so.
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-members-leaving-office
-   * @param {String} chamber 
-   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @param {String} chamber
+   * @param {Object} [{congress = this.congress, offset = 0}={}]
    * @returns {Promise}
    */
   getLeavingMembers(chamber, {congress = this.congress, offset = 0} = {}) {
@@ -212,11 +212,11 @@ const proto = {
    * to vote No on a roll call vote, and how often that happened. Perfect votes lists members in a
    * specific chamber and congress who voted Yes or No on every vote for which he or she was
    * eligible.
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-votes-by-type
-   * @param {String} chamber 
-   * @param {String} voteType 
-   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @param {String} chamber
+   * @param {String} voteType
+   * @param {Object} [{congress = this.congress, offset = 0}={}]
    * @returns {Promise}
    */
   getVotes(chamber, voteType, {congress = this.congress, offset = 0} = {}) {
@@ -227,9 +227,9 @@ const proto = {
   },
   /**
    * Resolves to Senate votes on presidential nominations
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-senate-nomination-votes
-   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @param {Object} [{congress = this.congress, offset = 0}={}]
    * @returns {Promise}
    */
   getSenateNominationVotes({congress = this.congress, offset = 0} = {}) {
@@ -238,10 +238,10 @@ const proto = {
   },
   /**
    * Resolves to lists of presidential nominations for civilian positions
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-recent-nominations-by-category
-   * @param {String} nomineeType 
-   * @param {Object} [{congress = this.congress}={}] 
+   * @param {String} nomineeType
+   * @param {Object} [{congress = this.congress}={}]
    * @returns {Promise}
    */
   getNominees(nomineeType, {congress = this.congress} = {}) {
@@ -263,8 +263,8 @@ const proto = {
    * Resolves to a list of Senate or House committees.
    *
    * @see https://propublica.github.io/congress-api-docs/#get-committees-and-committee-memberships
-   * @param {String} chamber 
-   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @param {String} chamber
+   * @param {Object} [{congress = this.congress, offset = 0}={}]
    * @returns {Promise}
    */
   getCommittees(chamber, {congress = this.congress, offset = 0} = {}) {
@@ -276,14 +276,14 @@ const proto = {
   /**
    * Resolves to a comparison of bill sponsorship or vote positions between two members who served
    * in the same Congress and chamber.
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#compare-two-members-vote-positions
    * @see https://propublica.github.io/congress-api-docs/#compare-two-members-39-bill-sponsorships
-   * @param {String} firstMemberId 
-   * @param {String} secondMemberId 
+   * @param {String} firstMemberId
+   * @param {String} secondMemberId
    * @param {String} chamber 'house' or 'senate'
    * @param {String} memberComparisonType 'bills' or 'votes'
-   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @param {Object} [{congress = this.congress, offset = 0}={}]
    * @returns {Promise}
    */
   getMemberComparison(firstMemberId, secondMemberId, chamber, memberComparisonType, {congress = this.congress, offset = 0} = {}) {
@@ -300,10 +300,10 @@ const proto = {
   /**
    * Resolves to the most recent vote positions for a specific member of the House of
    * Representatives or Senate
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-a-specific-member-39-s-vote-positions
-   * @param {String} memberId 
-   * @param {Object} [{offset = 0}={}] 
+   * @param {String} memberId
+   * @param {Object} [{offset = 0}={}]
    * @returns {Promise}
    */
   getVotesByMember(memberId, {offset = 0} = {}) {
@@ -312,9 +312,9 @@ const proto = {
   },
   /**
    * Resolves to a list of the most recent new members of the current Congress.
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-new-members
-   * @param {Object} [{offset = 0}={}] 
+   * @param {Object} [{offset = 0}={}]
    * @returns {Promise}
    */
   getNewMembers({offset = 0} = {}) {
@@ -322,10 +322,10 @@ const proto = {
   },
   /**
    * Resolves to a list of members of a particular chamber in a particular Congress.
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#lists-of-members
    * @param {String} chamber 'senate' or 'house'
-   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @param {Object} [{congress = this.congress, offset = 0}={}]
    * @returns {Promise}
    */
   getMemberList(chamber, {congress = this.congress, offset = 0} = {}) {
@@ -335,13 +335,13 @@ const proto = {
   },
   /**
    * Resolves to additional details about a particular bill of the given type.
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-a-subjects-amendments-and-related-bills-for-a-specific-bill
    * @see https://propublica.github.io/congress-api-docs/#get-cosponsors-for-a-specific-bill
    * @param {String} billId
    * @param {String} additionalBillDetailType 'subjects', 'amendments', 'related', or 'cosponsors'
-   * @param {Object} [{congress = this.congress, offset = 0}={}] 
-   * @returns 
+   * @param {Object} [{congress = this.congress, offset = 0}={}]
+   * @returns
    */
   getAdditionalBillDetails(billId, additionalBillDetailType, {congress = this.congress, offset = 0} = {}) {
     return Promise.all([
@@ -352,10 +352,10 @@ const proto = {
   },
   /**
    * Resolves to details about a particular bill, including actions taken and votes.
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-a-specific-bill
-   * @param {String} billId 
-   * @param {Object} [{congress = this.congress}={}] 
+   * @param {String} billId
+   * @param {Object} [{congress = this.congress}={}]
    * @returns {Promise}
    */
   getBill(billId, {congress = this.congress} = {}) {
@@ -368,11 +368,11 @@ const proto = {
    * Resolves to summaries of the 20 most recent bills by type. For the current Congress,
    * “recent bills” can be one of four types. For previous Congresses, “recent bills” means the last
    * 20 bills of that Congress.
-   * 
+   *
    * @see https://propublica.github.io/congress-api-docs/#get-recent-bills
    * @param {String} chamber 'senate' or 'house'
    * @param {String} recentBillType
-   * @param {Object} [{congress = this.congress, offset = 0}={}] 
+   * @param {Object} [{congress = this.congress, offset = 0}={}]
    * @returns {Promise}
    */
   getRecentBills(chamber, recentBillType, {congress = this.congress, offset = 0} = {}) {

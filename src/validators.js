@@ -66,7 +66,7 @@ function isValidApiKey(apiKey) {
 
 /**
  * Whether the given billId is appropriate for use with the API
- * @param {String} billId 
+ * @param {String} billId
  * @returns {Boolean}
  */
 function isValidBillId(billId) {
@@ -75,8 +75,8 @@ function isValidBillId(billId) {
 
 /**
  * Whether the given memberId looks valid and could be used with the API
- * 
- * @param {String} memberId 
+ *
+ * @param {String} memberId
  * @returns {Boolean}
  */
 function isValidMemberId(memberId) {
@@ -88,8 +88,8 @@ function isValidMemberId(memberId) {
 /**
  * Whether the given state is a US state with representation in congress and may be used with API
  * endpoints that accept a US state
- * 
- * @param {String} state 
+ *
+ * @param {String} state
  * @returns {Boolean}
  */
 function isValidState(state) {
@@ -98,8 +98,8 @@ function isValidState(state) {
 
 /**
  * Whether the argument is a valid district to use with the API
- * 
- * @param {Number} district 
+ *
+ * @param {Number} district
  * @returns {Boolean}
  */
 function isValidDistrict(district) {
@@ -108,8 +108,8 @@ function isValidDistrict(district) {
 
 /**
  * Whether the argument is a valid session of congress to use with the API
- * 
- * @param {Number} sessionNumber 
+ *
+ * @param {Number} sessionNumber
  * @returns {Boolean}
  */
 function isValidSessionNumber(sessionNumber) {
@@ -119,8 +119,8 @@ function isValidSessionNumber(sessionNumber) {
 
 /**
  * Whether the argument is a valid roll call vote number to use with the API
- * 
- * @param {Number} rollCallNumber 
+ *
+ * @param {Number} rollCallNumber
  * @returns {Boolean}
  */
 function isValidRollCallNumber(rollCallNumber) {
@@ -129,7 +129,7 @@ function isValidRollCallNumber(rollCallNumber) {
 
 /**
  * Whether the argument is a valid year for use with the API
- * 
+ *
  * @param {String} year Year in 'YYYY' format
  * @returns {Boolean}
  */
@@ -139,7 +139,7 @@ function isValidYear(year) {
 
 /**
  * Whether the argument is a valid month for use with the API
- * 
+ *
  * @param {String} month Month in 'MM' format
  * @returns {Boolean}
  */
@@ -149,8 +149,8 @@ function isValidMonth(month) {
 
 /**
  * Whether the argument is a valid house or senate committee ID and appropriate for use with the API
- * 
- * @param {String} committeeId 
+ *
+ * @param {String} committeeId
  * @returns {Boolean}
  */
 function isValidCommitteeId(committeeId) {
