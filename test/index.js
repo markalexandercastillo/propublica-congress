@@ -197,7 +197,7 @@ describe('pro-publica-congress', () => {
           .then(() => verify(api.get(anything(), '{offset}')));
       });
     });
-    
+
     describe('.getMemberList()', () => {
       it("performs a request to an endpoint resembling '{congress}/{chamber}/members'", () => {
         return ppc.getMemberList('{chamber}')
@@ -286,11 +286,11 @@ describe('pro-publica-congress', () => {
 
     describe('.getMemberComparison()', () => {
       /**
-       * Helper to minimize repeating this multi-line invocation. Wraps around the call to 
+       * Helper to minimize repeating this multi-line invocation. Wraps around the call to
        * ppc.getMemberComparison using an options hash whose keys map to the arguments of the method
        * the required parameters have default values set which may or may not be referenced in a
        * test. They may also be overridden for the purposes of the test.
-       * 
+       *
        * @param {Object} [{
        *         firstMemberId = '{member-id}',
        *         secondMemberId = '{second-member-id}',
@@ -298,8 +298,8 @@ describe('pro-publica-congress', () => {
        *         memberComparisonType = '{member-comparison-type}',
        *         congress,
        *         offset
-       *       }={}] 
-       * @returns 
+       *       }={}]
+       * @returns
        */
       function getMemberComparison({
         firstMemberId = '{member-id}',
@@ -722,17 +722,17 @@ describe('pro-publica-congress', () => {
         return ppc.getCommittees('{chamber}', {congress: '{different-congress}'})
           .then(() => looseVerify(api.get('{different-congress}/{chamber}/committees')));
       });
-    
+
       it('validates against the 110th congress as the earliest', () => {
         return ppc.getCommittees('{chamber}')
           .then(() => verify(validators.isValidCongress(anything(), 110)));
       });
-    
+
       it('rejects with an invalid congress', () => {
         return ppc.getCommittees('{chamber}', {congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
-    
+
       it('rejects with an invalid chamber', () => {
         return ppc.getCommittees('{invalid-chamber}')
           .should.be.rejectedWith(Error, 'Received invalid chamber:');

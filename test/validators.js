@@ -66,7 +66,7 @@ describe('validators', () => {
       `accepts '${validChamber}'`,
       () => validators.isValidChamber(validChamber).should.be.true
     ));
-    
+
     it('rejects anything else', () => {
       validators.isValidChamber('').should.be.false;
       validators.isValidChamber().should.be.false;
