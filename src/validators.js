@@ -3,6 +3,8 @@
  * for minimizing unnecessary API calls
  */
 
+const statesArray = require('./states');
+
 /**
  * Whether the argument is a valid offset to send to the ProPublica API
  * @param {String|Number} offset
@@ -85,7 +87,88 @@ function isValidMemberId(memberId) {
     && !!(match = memberId.match(/[A-Z]\d{6}/)) && !!match && match[0] === memberId;
 }
 
+const states = new Set(statesArray);
+
+/**
+ * Whether the given state is a US state with representation in congress and may be used with API
+ * endpoints that accept a US state
+ * 
+ * @param {String} state 
+ * @returns {Boolean}
+ */
+function isValidState(state) {
+  return isValidType(state, states);
+}
+
+/**
+ * Whether the argument is a valid district to use with the API
+ * 
+ * @param {Number} district 
+ * @returns {Boolean}
+ */
+function isValidDistrict(district) {
+  return !!district && parseInt(district) > 0;
+}
+
+/**
+ * Whether the argument is a valid session of congress to use with the API
+ * 
+ * @param {Number} sessionNumber 
+ * @returns {Boolean}
+ */
+function isValidSessionNumber(sessionNumber) {
+  return parseInt(sessionNumber) === 1
+    || parseInt(sessionNumber) === 2;
+}
+
+/**
+ * Whether the argument is a valid roll call vote number to use with the API
+ * 
+ * @param {Number} rollCallNumber 
+ * @returns {Boolean}
+ */
+function isValidRollCallNumber(rollCallNumber) {
+  return !!rollCallNumber && parseInt(rollCallNumber) > 0;
+}
+
+/**
+ * Whether the argument is a valid year for use with the API
+ * 
+ * @param {String} year Year in 'YYYY' format
+ * @returns {Boolean}
+ */
+function isValidYear(year) {
+  return /(19|20)\d\d/.test(year)
+}
+
+/**
+ * Whether the argument is a valid month for use with the API
+ * 
+ * @param {String} month Month in 'MM' format
+ * @returns {Boolean}
+ */
+function isValidMonth(month) {
+  return /(0[1-9]|1[012])/.test(month);
+}
+
+/**
+ * Whether the argument is a valid house or senate committee ID and appropriate for use with the API
+ * 
+ * @param {String} committeeId 
+ * @returns {Boolean}
+ */
+function isValidCommitteeId(committeeId) {
+  return /(SS|HS)[A-Z]{2}/.test(committeeId);
+}
+
 module.exports = {
+  isValidCommitteeId,
+  isValidMonth,
+  isValidYear,
+  isValidRollCallNumber,
+  isValidSessionNumber,
+  isValidDistrict,
+  isValidState,
   isValidMemberId,
   isValidBillId,
   isValidCongress,

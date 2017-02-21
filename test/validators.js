@@ -1,4 +1,5 @@
 const chai = require('chai')
+  , states = require('./../src/states')
   , validators = require('./../src/validators');
 
 chai.should();
@@ -136,6 +137,123 @@ describe('validators', () => {
       validators.isValidMemberId(123).should.be.false;
       validators.isValidMemberId(null).should.be.false;
       validators.isValidMemberId({}).should.be.false;
+    });
+  });
+
+  describe('isValidState()', () => {
+    states.forEach(state => it(
+      `accepts '${state}'`,
+      () => validators.isValidState(state).should.be.true
+    ));
+
+    it('rejects anything else', () => {
+      validators.isValidState().should.be.false;
+      validators.isValidState('NON').should.be.false;
+      validators.isValidState(123).should.be.false;
+      validators.isValidState(null).should.be.false;
+      validators.isValidState({}).should.be.false;
+    });
+  });
+
+  describe('isValidDistrict()', () => {
+    it('accepts numbers greater than 0', () => {
+      validators.isValidDistrict(1).should.be.true;
+      validators.isValidDistrict(3).should.be.true;
+      validators.isValidDistrict(12).should.be.true;
+    });
+
+    it('rejects anything else', () => {
+      validators.isValidDistrict().should.be.false;
+      validators.isValidDistrict('NON').should.be.false;
+      validators.isValidDistrict(0).should.be.false;
+      validators.isValidDistrict(null).should.be.false;
+      validators.isValidDistrict({}).should.be.false;
+    });
+  });
+
+  describe('isValidSessionNumber()', () => {
+    it('only accepts 1 and 2', () => {
+      validators.isValidSessionNumber(1).should.be.true;
+      validators.isValidSessionNumber(2).should.be.true;
+    });
+
+    it('rejects anything else', () => {
+      validators.isValidSessionNumber().should.be.false;
+      validators.isValidSessionNumber('NON').should.be.false;
+      validators.isValidSessionNumber('N123').should.be.false;
+      validators.isValidSessionNumber(0).should.be.false;
+      validators.isValidSessionNumber(null).should.be.false;
+      validators.isValidSessionNumber(3).should.be.false;
+      validators.isValidSessionNumber({}).should.be.false;
+    });
+  });
+
+  describe('isValidRollCallNumber()', () => {
+    it('accepts numbers greater than 0', () => {
+      validators.isValidRollCallNumber(1).should.be.true;
+      validators.isValidRollCallNumber(3).should.be.true;
+      validators.isValidRollCallNumber(12).should.be.true;
+    });
+
+    it('rejects anything else', () => {
+      validators.isValidRollCallNumber().should.be.false;
+      validators.isValidRollCallNumber('NON').should.be.false;
+      validators.isValidRollCallNumber(0).should.be.false;
+      validators.isValidRollCallNumber(null).should.be.false;
+      validators.isValidRollCallNumber({}).should.be.false;
+    });
+  });
+
+  describe('isValidYear()', () => {
+    it('accepts years in YYYY format', () => {
+      validators.isValidYear('2001').should.be.true;
+      validators.isValidYear('2013').should.be.true;
+      validators.isValidYear('1992').should.be.true;
+      validators.isValidYear('1986').should.be.true;
+    });
+
+    it('rejects anything else', () => {
+      validators.isValidYear().should.be.false;
+      validators.isValidYear('NON').should.be.false;
+      validators.isValidYear(0).should.be.false;
+      validators.isValidYear(null).should.be.false;
+      validators.isValidYear({}).should.be.false;
+    });
+  });
+
+  describe('isValidMonth()', () => {
+    it('accepts months in MM format', () => {
+      validators.isValidMonth('01').should.be.true;
+      validators.isValidMonth('12').should.be.true;
+      validators.isValidMonth('08').should.be.true;
+      validators.isValidMonth('10').should.be.true;
+    });
+
+    it('rejects anything else', () => {
+      validators.isValidMonth().should.be.false;
+      validators.isValidMonth('NON').should.be.false;
+      validators.isValidMonth('13').should.be.false;
+      validators.isValidMonth('1').should.be.false;
+      validators.isValidMonth(0).should.be.false;
+      validators.isValidMonth(null).should.be.false;
+      validators.isValidMonth({}).should.be.false;
+    });
+  });
+
+  describe('isValidCommitteeId()', () => {
+    it("accepts four-character alpha strings beginning with HS or SS", () => {
+      validators.isValidCommitteeId('HSHA').should.be.true;
+      validators.isValidCommitteeId('SSCM').should.be.true;
+    });
+
+    it('rejects anything else', () => {
+      validators.isValidCommitteeId().should.be.false;
+      validators.isValidCommitteeId('HS').should.be.false;
+      validators.isValidCommitteeId('SSB').should.be.false;
+      validators.isValidCommitteeId('1').should.be.false;
+      validators.isValidCommitteeId(0).should.be.false;
+      validators.isValidCommitteeId(null).should.be.false;
+      validators.isValidCommitteeId({}).should.be.false;
     });
   });
 });
