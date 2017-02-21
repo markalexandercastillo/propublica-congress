@@ -1,4 +1,4 @@
-const {create, assign} = Object
+const {create, assign, keys} = Object
   , {stringify} = JSON
   , client = require('./client')
   , validators = require('./validators');
@@ -41,89 +41,47 @@ const memberBillTypes = new Set([
   'updated'
 ]);
 
-function validateChamber(chamber) {
-  return new Promise((resolve, reject) => validators.isValidChamber(chamber)
-    ? resolve()
-    : reject(new Error(`Received invalid chamber: ${stringify(chamber)}`))
-  );
-}
+/**
+ * Creates a new object with promise-based versions of the validator functions
+ * which take the same arguments (with the exception of the corresponding function
+ * to isValidType, which takes an additional descriptor argument). These functions
+ * resolve if the validator passes. They will otherwise reject with an Error
+ * message composed from the name of the function or the descriptor for 'isType'
+ * functions.
+ *
+ * eg. validators.isValidCommitteeId gets mapped to validate.committeeId which rejects
+ * with an error 'Received invalid committee id: ...'
+ *
+ * There were previously explicit definitions for these functions.
+ */
+const validate =
+  // take all function names
+  keys(validators)
+    .reduce((validate, validatorName) => {
+      let validateName = validatorName.replace('isValid', '');
+      validateName = `${validateName[0].toLowerCase()}${validateName.slice(1)}`;
+      return assign(validate, {
+        [validateName](...args) {
+          const descriptor = validateName === 'type'
+            // isValidType is meant for different scenarios so validators.type takes accepts
+            // an extra arg meant to be a more specific descriptor
+            ? args[args.length -1]
+            : validateName.replace(/[A-Z]/g, letter => ` ${letter.toLowerCase()}`).trim();
 
-function validateCongress(session, earliestSession) {
-  return new Promise((resolve, reject) => validators.isValidCongress(session, earliestSession)
-    ? resolve()
-    : reject(new Error(`Received invalid congress: ${stringify(session)}`))
-  );
-}
+          args = validateName === 'type'
+            // omit the last argument passed for isValidType calls which is expected to be a
+            // descriptor
+            ? args.slice(0, -1)
+            : args;
 
-function validateType(type, typeSet, descriptor) {
-  return new Promise((resolve, reject) => validators.isValidType(type, typeSet)
-    ? resolve()
-    : reject(new Error(`Received invalid ${descriptor}: ${stringify(type)}`))
-  );
-}
+          return new Promise((resolve, reject) => validators[validatorName](...args)
+            ? resolve()
+            : reject(new Error(`Received invalid ${descriptor}: ${stringify(args[0])}`))
+          );
+        }
+      });
+    }, {});
 
-function validateBillId(billId) {
-  return new Promise((resolve, reject) => validators.isValidBillId(billId)
-    ? resolve()
-    : reject(new Error(`Received invalid bill ID: ${stringify(billId)}`))
-  );
-}
-
-function validateMemberId(memberId) {
-  return new Promise((resolve, reject) => validators.isValidMemberId(memberId)
-    ? resolve()
-    : reject(new Error(`Received invalid member ID: ${stringify(memberId)}`))
-  );
-}
-
-function validateState(state) {
-  return new Promise((resolve, reject) => validators.isValidState(state)
-    ? resolve()
-    : reject(new Error(`Received invalid state: ${stringify(state)}`))
-  );
-}
-
-function validateDistrict(district) {
-  return new Promise((resolve, reject) => validators.isValidDistrict(district)
-    ? resolve()
-    : reject(new Error(`Received invalid district: ${stringify(district)}`))
-  );
-}
-
-function validateSessionNumber(sessionNumber) {
-  return new Promise((resolve, reject) => validators.isValidSessionNumber(sessionNumber)
-    ? resolve()
-    : reject(new Error(`Received invalid session number: ${stringify(sessionNumber)}`))
-  );
-}
-
-function validateRollCallNumber(rollCallNumber) {
-  return new Promise((resolve, reject) => validators.isValidRollCallNumber(rollCallNumber)
-    ? resolve()
-    : reject(new Error(`Received invalid roll call number: ${stringify(rollCallNumber)}`))
-  );
-}
-
-function validateYear(year) {
-  return new Promise((resolve, reject) => validators.isValidYear(year)
-    ? resolve()
-    : reject(new Error(`Received invalid year: ${stringify(year)}`))
-  );
-}
-
-function validateMonth(month) {
-  return new Promise((resolve, reject) => validators.isValidMonth(month)
-    ? resolve()
-    : reject(new Error(`Received invalid month: ${stringify(month)}`))
-  );
-}
-
-function validateCommitteeId(committeeId) {
-  return new Promise((resolve, reject) => validators.isValidCommitteeId(committeeId)
-    ? resolve()
-    : reject(new Error(`Received invalid committee ID: ${stringify(committeeId)}`))
-  );
-}
 
 const proto = {
   /**
@@ -137,9 +95,9 @@ const proto = {
    */
   getCommitteeMembers(chamber, committeeId, {congress = this.congress, offset = 0} = {}) {
     return Promise.all([
-      validateChamber(chamber),
-      validateCongress(congress, 110),
-      validateCommitteeId(committeeId)
+      validate.chamber(chamber),
+      validate.congress(congress, 110),
+      validate.committeeId(committeeId)
     ]).then(() => this.client.get(`${congress}/${chamber}/committees/${committeeId}`, offset));
   },
   /**
@@ -152,8 +110,8 @@ const proto = {
    */
   getNomineesByState(state, {congress = this.congress} = {}) {
     return Promise.all([
-      validateState(state),
-      validateCongress(congress, 107)
+      validate.state(state),
+      validate.congress(congress, 107)
     ]).then(() => this.client.get(`${congress}/nominees/state/${state}`));
   },
   /**
@@ -167,10 +125,10 @@ const proto = {
    */
   getVotesByDate(chamber, year, month) {
     return Promise.all([
-      validateChamber(chamber),
-      validateYear(year),
-      validateMonth(month)
-    ]).then(() => this.client.get(`${chamber}/votes/${year}/${month}`))
+      validate.chamber(chamber),
+      validate.year(year),
+      validate.month(month)
+    ]).then(() => this.client.get(`${chamber}/votes/${year}/${month}`));
   },
   /**
    * Resolves to a specific roll-call vote, including a complete list of member positions.
@@ -184,9 +142,9 @@ const proto = {
    */
   getRollCallVotes(chamber, sessionNumber, rollCallNumber, {congress = this.congress} = {}) {
     return Promise.all([
-      validateRollCallNumber(rollCallNumber),
-      validateSessionNumber(sessionNumber),
-      validateChamber(chamber).then(() => validateCongress(congress, {house: 102, senate: 101}[chamber]))
+      validate.rollCallNumber(rollCallNumber),
+      validate.sessionNumber(sessionNumber),
+      validate.chamber(chamber).then(() => validate.congress(congress, {house: 102, senate: 101}[chamber]))
     ]).then(() => this.client.get(`${congress}/${chamber}/sessions/${sessionNumber}/votes/${rollCallNumber}`));
   },
   /**
@@ -201,8 +159,8 @@ const proto = {
    */
   getBillsByMember(memberId, memberBillType, {offset = 0} = {}) {
     return Promise.all([
-      validateMemberId(memberId),
-      validateType(memberBillType, memberBillTypes, 'member bill type')
+      validate.memberId(memberId),
+      validate.type(memberBillType, memberBillTypes, 'member bill type')
     ]).then(() => this.client.get(`members/${memberId}/bills/${memberBillType}`, offset));
   },
   /**
@@ -216,8 +174,8 @@ const proto = {
    */
   getCurrentRepresentatives(state, district) {
     return Promise.all([
-      validateState(state),
-      validateDistrict(district)
+      validate.state(state),
+      validate.district(district)
     ]).then(() => this.client.get(`members/house/${state}/${district}/current`));
   },
   /**
@@ -228,7 +186,7 @@ const proto = {
    * @returns {Promise}
    */
   getCurrentSenators(state) {
-    return validateState(state)
+    return validate.state(state)
       .then(() => this.client.get(`members/senate/${state}/current`));
   },
   /**
@@ -242,8 +200,8 @@ const proto = {
    */
   getLeavingMembers(chamber, {congress = this.congress, offset = 0} = {}) {
     return Promise.all([
-      validateCongress(congress, 111),
-      validateChamber(chamber)
+      validate.congress(congress, 111),
+      validate.chamber(chamber)
     ]).then(() => this.client.get(`${congress}/${chamber}/members/leaving`, offset));
   },
   /**
@@ -264,8 +222,8 @@ const proto = {
    */
   getVotes(chamber, voteType, {congress = this.congress, offset = 0} = {}) {
     return Promise.all([
-      validateType(voteType, voteTypes, 'vote type'),
-      validateChamber(chamber).then(() => validateCongress(congress, {senate: 101, house: 102}[chamber]))
+      validate.type(voteType, voteTypes, 'vote type'),
+      validate.chamber(chamber).then(() => validate.congress(congress, {senate: 101, house: 102}[chamber]))
     ]).then(() => this.client.get(`${congress}/${chamber}/votes/${voteType}`, offset));
   },
   /**
@@ -276,7 +234,7 @@ const proto = {
    * @returns {Promise}
    */
   getSenateNominationVotes({congress = this.congress, offset = 0} = {}) {
-    return validateCongress(congress, 101)
+    return validate.congress(congress, 101)
       .then(() => this.client.get(`${congress}/nominations`, offset));
   },
   /**
@@ -289,8 +247,8 @@ const proto = {
    */
   getNominees(nomineeType, {congress = this.congress} = {}) {
     return Promise.all([
-      validateCongress(congress, 107),
-      validateType(nomineeType, nomineeTypes, 'nominee type')
+      validate.congress(congress, 107),
+      validate.type(nomineeType, nomineeTypes, 'nominee type')
     ]).then(() => this.client.get(`${congress}/nominees/${nomineeType}`));
   },
   /**
@@ -312,8 +270,8 @@ const proto = {
    */
   getCommittees(chamber, {congress = this.congress, offset = 0} = {}) {
     return Promise.all([
-      validateCongress(congress, 110),
-      validateChamber(chamber)
+      validate.congress(congress, 110),
+      validate.chamber(chamber)
     ]).then(() => this.client.get(`${congress}/${chamber}/committees`, offset));
   },
   /**
@@ -331,10 +289,10 @@ const proto = {
    */
   getMemberComparison(firstMemberId, secondMemberId, chamber, memberComparisonType, {congress = this.congress, offset = 0} = {}) {
     return Promise.all([
-      validateMemberId(firstMemberId),
-      validateMemberId(secondMemberId),
-      validateType(memberComparisonType, memberComparisonTypes, 'member comparison type'),
-      validateChamber(chamber).then(() => validateCongress(congress, {senate: 101, house: 102}[chamber]))
+      validate.memberId(firstMemberId),
+      validate.memberId(secondMemberId),
+      validate.type(memberComparisonType, memberComparisonTypes, 'member comparison type'),
+      validate.chamber(chamber).then(() => validate.congress(congress, {senate: 101, house: 102}[chamber]))
     ]).then(() => {
       const endpoint = `members/${firstMemberId}/${memberComparisonType}/${secondMemberId}/${congress}/${chamber}`;
       return this.client.get(endpoint, offset);
@@ -350,7 +308,7 @@ const proto = {
    * @returns {Promise}
    */
   getVotesByMember(memberId, {offset = 0} = {}) {
-    return validateMemberId(memberId)
+    return validate.memberId(memberId)
       .then(() => this.client.get(`members/${memberId}/votes`, offset));
   },
   /**
@@ -372,8 +330,8 @@ const proto = {
    * @returns {Promise}
    */
   getMemberList(chamber, {congress = this.congress, offset = 0} = {}) {
-    return validateChamber(chamber)
-      .then(() => validateCongress(congress, {senate: 80, house: 102}[chamber]))
+    return validate.chamber(chamber)
+      .then(() => validate.congress(congress, {senate: 80, house: 102}[chamber]))
       .then(() => this.client.get(`${congress}/${chamber}/members`, offset));
   },
   /**
@@ -388,9 +346,9 @@ const proto = {
    */
   getAdditionalBillDetails(billId, additionalBillDetailType, {congress = this.congress, offset = 0} = {}) {
     return Promise.all([
-      validateCongress(congress, 105),
-      validateBillId(billId),
-      validateType(additionalBillDetailType, additionalBillDetailTypes, 'additional bill detail type')
+      validate.congress(congress, 105),
+      validate.billId(billId),
+      validate.type(additionalBillDetailType, additionalBillDetailTypes, 'additional bill detail type')
     ]).then(() => this.client.get(`${congress}/bills/${billId}/${additionalBillDetailType}`, offset));
   },
   /**
@@ -403,8 +361,8 @@ const proto = {
    */
   getBill(billId, {congress = this.congress} = {}) {
     return Promise.all([
-      validateCongress(congress, 105),
-      validateBillId(billId)
+      validate.congress(congress, 105),
+      validate.billId(billId)
     ]).then(() => this.client.get(`${congress}/bills/${billId}`));
   },
   /**
@@ -420,9 +378,9 @@ const proto = {
    */
   getRecentBills(chamber, recentBillType, {congress = this.congress, offset = 0} = {}) {
     return Promise.all([
-      validateChamber(chamber),
-      validateCongress(congress, 105),
-      validateType(recentBillType, recentBillTypes, 'recent bill type')
+      validate.chamber(chamber),
+      validate.congress(congress, 105),
+      validate.type(recentBillType, recentBillTypes, 'recent bill type')
     ]).then(() => this.client.get(`${congress}/${chamber}/bills/${recentBillType}`, offset));
   }
 };

@@ -163,7 +163,7 @@ describe('pro-publica-congress', () => {
 
       it('rejects with an invalid bill ID', () => {
         return ppc.getBill('{invalid-bill-id}')
-          .should.be.rejectedWith(Error, 'Received invalid bill ID:');
+          .should.be.rejectedWith(Error, 'Received invalid bill id:');
       });
     });
 
@@ -197,7 +197,7 @@ describe('pro-publica-congress', () => {
 
       it('rejects with an invalid bill ID', () => {
         return ppc.getAdditionalBillDetails('{invalid-bill-id}', '{additional-bill-detail-type}')
-          .should.be.rejectedWith(Error, 'Received invalid bill ID:');
+          .should.be.rejectedWith(Error, 'Received invalid bill id:');
       });
 
       it('validates against recent bill types', () => {
@@ -334,7 +334,7 @@ describe('pro-publica-congress', () => {
 
       it('rejects with an invalid member ID', () => {
         return ppc.getVotesByMember('{invalid-member-id}')
-          .should.be.rejectedWith(Error, 'Received invalid member ID:');
+          .should.be.rejectedWith(Error, 'Received invalid member id:');
       });
 
       it('sets the offset to 0 by default', () => {
@@ -420,12 +420,12 @@ describe('pro-publica-congress', () => {
 
       it('rejects with an invalid first member ID', () => {
         return getMemberComparison({firstMemberId: '{invalid-member-id}'})
-          .should.be.rejectedWith(Error, 'Received invalid member ID:');
+          .should.be.rejectedWith(Error, 'Received invalid member id:');
       });
 
       it('rejects with an invalid second member ID', () => {
         return getMemberComparison({secondMemberId: '{invalid-second-member-id}'})
-          .should.be.rejectedWith(Error, 'Received invalid member ID:');
+          .should.be.rejectedWith(Error, 'Received invalid member id:');
       });
 
       it('rejects with an invalid chamber', () => {
@@ -587,7 +587,7 @@ describe('pro-publica-congress', () => {
 
       it('rejects with an invalid member ID', () => {
         return ppc.getBillsByMember('{invalid-member-id}', '{member-bill-type}')
-          .should.be.rejectedWith(Error, 'Received invalid member ID');
+          .should.be.rejectedWith(Error, 'Received invalid member id:');
       });
 
       it('sets the offset to 0 by default', () => {
@@ -981,7 +981,7 @@ describe('pro-publica-congress', () => {
 
       it('rejects with an invalid committee ID', () => {
         return ppc.getCommitteeMembers('{chamber}', '{invalid-committee-id}')
-          .should.be.rejectedWith(Error, 'Received invalid committee ID:');
+          .should.be.rejectedWith(Error, 'Received invalid committee id:');
       });
 
       it('sets the offset to 0 by default', () => {
