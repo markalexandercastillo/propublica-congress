@@ -55,11 +55,8 @@ describe('pro-publica-congress', () => {
     let ppc, api;
     beforeEach(() => {
       api = object(['get']);
-      when(apiModule.create(anything()))
-        .thenReturn(api);
-
-      looseWhen(api.get())
-        .thenResolve({});
+      when(apiModule.create(anything())).thenReturn(api);
+      looseWhen(api.get()).thenResolve({});
 
       ppc = createPpc('PROPUBLICA_API_KEY', '{congress}');
     });
@@ -67,32 +64,22 @@ describe('pro-publica-congress', () => {
     describe('.getRecentBills()', () => {
       it("performs a request to an endpoint resembling '{congress}/{chamber}/bills/{recent-bill-type}'", () => {
         return ppc.getRecentBills('{chamber}', '{recent-bill-type}')
-          .then(() => looseVerify(api.get(
-            '{congress}/{chamber}/bills/{recent-bill-type}'
-          )));
+          .then(() => looseVerify(api.get('{congress}/{chamber}/bills/{recent-bill-type}')));
       });
 
       it("performs request to the endpoint respecting the given congress", () => {
         return ppc.getRecentBills('{chamber}', '{recent-bill-type}', {congress: '{different-congress}'})
-          .then(() => looseVerify(api.get(
-            '{different-congress}/{chamber}/bills/{recent-bill-type}'
-          )));
+          .then(() => looseVerify(api.get('{different-congress}/{chamber}/bills/{recent-bill-type}')));
       });
 
       it('sets the offset to 0 by default', () => {
         return ppc.getRecentBills('{chamber}', '{recent-bill-type}')
-          .then(() => verify(api.get(
-            anything(),
-            0
-          )));
+          .then(() => verify(api.get(anything(), 0 )));
       });
 
       it('sets the given offset', () => {
         return ppc.getRecentBills('{chamber}', '{recent-bill-type}', {offset: '{offset}'})
-          .then(() => verify(api.get(
-            anything(),
-            '{offset}'
-          )));
+          .then(() => verify(api.get(anything(), '{offset}')));
       });
 
       it('rejects with an invalid chamber', () => {
@@ -107,23 +94,17 @@ describe('pro-publica-congress', () => {
 
       it('validates against the 105th congress as the earliest', () => {
         return ppc.getRecentBills('{chamber}', '{recent-bill-type}')
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            105
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 105)));
       });
 
       it('validates against recent bill types', () => {
         return ppc.getRecentBills('{chamber}', '{recent-bill-type}')
-          .then(() => verify(validators.isValidType(
-            '{recent-bill-type}',
-            [
-              'introduced',
-              'updated',
-              'passed',
-              'major'
-            ]
-          )));
+          .then(() => verify(validators.isValidType('{recent-bill-type}', [
+            'introduced',
+            'updated',
+            'passed',
+            'major'
+          ])));
       });
 
       it('rejects with an invalid recent bill type', () => {
@@ -135,16 +116,12 @@ describe('pro-publica-congress', () => {
     describe('.getBill()', () => {
       it("performs a request to an endpoint resembling '{congress}/bills/{bill-id}'", () => {
         return ppc.getBill('{bill-id}')
-          .then(() => looseVerify(api.get(
-            '{congress}/bills/{bill-id}'
-          )));
+          .then(() => looseVerify(api.get('{congress}/bills/{bill-id}')));
       });
 
       it("performs request to the endpoint respecting the given congress", () => {
         return ppc.getBill('{bill-id}', {congress: '{different-congress}'})
-          .then(() => looseVerify(api.get(
-            '{different-congress}/bills/{bill-id}'
-          )));
+          .then(() => looseVerify(api.get('{different-congress}/bills/{bill-id}')));
       });
 
       it('rejects with an invalid congress', () => {
@@ -154,10 +131,7 @@ describe('pro-publica-congress', () => {
 
       it('validates against the 105th congress as the earliest', () => {
         return ppc.getBill('{bill-id}')
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            105
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 105)));
       });
 
       it('rejects with an invalid bill ID', () => {
@@ -169,16 +143,12 @@ describe('pro-publica-congress', () => {
     describe('.getAdditionalBillDetails()', () => {
       it("performs a request to an endpoint resembling '{congress}/bills/{bill-id}/{additional-bill-detail-type}'", () => {
         return ppc.getAdditionalBillDetails('{bill-id}', '{additional-bill-detail-type}')
-          .then(() => looseVerify(api.get(
-            '{congress}/bills/{bill-id}/{additional-bill-detail-type}'
-          )));
+          .then(() => looseVerify(api.get('{congress}/bills/{bill-id}/{additional-bill-detail-type}')));
       });
 
       it("performs request to the endpoint respecting the given congress", () => {
         return ppc.getAdditionalBillDetails('{bill-id}', '{additional-bill-detail-type}', {congress: '{different-congress}'})
-          .then(() => looseVerify(api.get(
-            '{different-congress}/bills/{bill-id}/{additional-bill-detail-type}'
-          )));
+          .then(() => looseVerify(api.get('{different-congress}/bills/{bill-id}/{additional-bill-detail-type}')));
       });
 
       it('rejects with an invalid congress', () => {
@@ -188,10 +158,7 @@ describe('pro-publica-congress', () => {
 
       it('validates against the 105th congress as the earliest', () => {
         return ppc.getAdditionalBillDetails('{bill-id}', '{additional-bill-detail-type}')
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            105
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 105)));
       });
 
       it('rejects with an invalid bill ID', () => {
@@ -201,15 +168,12 @@ describe('pro-publica-congress', () => {
 
       it('validates against recent bill types', () => {
         return ppc.getAdditionalBillDetails('{bill-id}', '{additional-bill-detail-type}')
-          .then(() => verify(validators.isValidType(
-            '{additional-bill-detail-type}',
-            [
-              'subjects',
-              'amendments',
-              'related',
-              'cosponsors'
-            ]
-          )));
+          .then(() => verify(validators.isValidType('{additional-bill-detail-type}', [
+            'subjects',
+            'amendments',
+            'related',
+            'cosponsors'
+          ])));
       });
 
       it('rejects with an invalid recent bill type', () => {
@@ -219,50 +183,34 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getAdditionalBillDetails('{bill-id}', '{additional-bill-detail-type}')
-          .then(() => verify(api.get(
-            anything(),
-            0
-          )));
+          .then(() => verify(api.get(anything(), 0)));
       });
 
       it('sets the given offset', () => {
         return ppc.getAdditionalBillDetails('{bill-id}', '{additional-bill-detail-type}', {offset: '{offset}'})
-          .then(() => verify(api.get(
-            anything(),
-            '{offset}'
-          )));
+          .then(() => verify(api.get(anything(), '{offset}')));
       });
     });
     
     describe('.getMemberList()', () => {
       it("performs a request to an endpoint resembling '{congress}/{chamber}/members'", () => {
         return ppc.getMemberList('{chamber}')
-          .then(() => looseVerify(api.get(
-            '{congress}/{chamber}/members'
-          )));
+          .then(() => looseVerify(api.get('{congress}/{chamber}/members')));
       });
 
       it("performs request to the endpoint respecting the given congress", () => {
         return ppc.getMemberList('{chamber}', {congress: '{different-congress}'})
-          .then(() => looseVerify(api.get(
-            '{different-congress}/{chamber}/members'
-          )));
+          .then(() => looseVerify(api.get('{different-congress}/{chamber}/members')));
       });
 
       it('sets the offset to 0 by default', () => {
         return ppc.getMemberList('{chamber}')
-          .then(() => verify(api.get(
-            anything(),
-            0
-          )));
+          .then(() => verify(api.get(anything(), 0)));
       });
 
       it('sets the given offset', () => {
         return ppc.getMemberList('{chamber}', {offset: '{offset}'})
-          .then(() => verify(api.get(
-            anything(),
-            '{offset}'
-          )));
+          .then(() => verify(api.get(anything(), '{offset}')));
       });
 
       it('rejects with an invalid chamber', () => {
@@ -272,10 +220,7 @@ describe('pro-publica-congress', () => {
 
       it('validates against the 102nd congress as the earliest for the house', () => {
         return ppc.getMemberList('house')
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            102
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 102)));
       });
 
       it('reject on house lists before the 102nd congress', () => {
@@ -290,44 +235,31 @@ describe('pro-publica-congress', () => {
 
       it('validates against the 80th congress as the earliest for the senate', () => {
         return ppc.getMemberList('senate')
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            80
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 80)));
       });
     });
 
     describe('.getNewMembers()', () => {
       it("performs a request to an endpoint resembling 'members/new'", () => {
         return ppc.getNewMembers()
-          .then(() => looseVerify(api.get(
-            'members/new'
-          )));
+          .then(() => looseVerify(api.get('members/new')));
       });
 
       it('sets the offset to 0 by default', () => {
         return ppc.getNewMembers()
-          .then(() => verify(api.get(
-            anything(),
-            0
-          )));
+          .then(() => verify(api.get(anything(), 0)));
       });
 
       it('sets the given offset', () => {
         return ppc.getNewMembers({offset: '{offset}'})
-          .then(() => verify(api.get(
-            anything(),
-            '{offset}'
-          )));
+          .then(() => verify(api.get(anything(), '{offset}')));
       });
     });
 
     describe('.getVotesByMember()', () => {
       it("performs a request to an endpoint resembling 'members/{member-id}/votes'", () => {
         return ppc.getVotesByMember('{member-id}')
-          .then(() => looseVerify(api.get(
-            'members/{member-id}/votes'
-          )));
+          .then(() => looseVerify(api.get('members/{member-id}/votes')));
       });
 
       it('rejects with an invalid member ID', () => {
@@ -337,18 +269,12 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getVotesByMember('{member-id}')
-          .then(() => verify(api.get(
-            anything(),
-            0
-          )));
+          .then(() => verify(api.get(anything(), 0)));
       });
 
       it('sets the given offset', () => {
         return ppc.getVotesByMember('{member-id}', {offset: '{offset}'})
-          .then(() => verify(api.get(
-            anything(),
-            '{offset}'
-          )));
+          .then(() => verify(api.get(anything(), '{offset}')));
       });
     });
 
@@ -388,32 +314,22 @@ describe('pro-publica-congress', () => {
 
       it("performs request to an endpoint resembling 'members/{first-member-id}/{member-comparison-type}/{second-member-id}/{congress}/{chamber}'", () => {
         return getMemberComparison()
-          .then(() => looseVerify(api.get(
-            'members/{member-id}/{member-comparison-type}/{second-member-id}/{congress}/{chamber}'
-          )));
+          .then(() => looseVerify(api.get('members/{member-id}/{member-comparison-type}/{second-member-id}/{congress}/{chamber}')));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return getMemberComparison({congress: '{different-congress}'})
-          .then(() => looseVerify(api.get(
-            'members/{member-id}/{member-comparison-type}/{second-member-id}/{different-congress}/{chamber}'
-          )));
+          .then(() => looseVerify(api.get('members/{member-id}/{member-comparison-type}/{second-member-id}/{different-congress}/{chamber}')));
       });
 
       it('sets the offset to 0 by default', () => {
         return getMemberComparison()
-          .then(() => verify(api.get(
-            anything(),
-            0
-          )));
+          .then(() => verify(api.get(anything(), 0)));
       });
 
       it('sets the given offset', () => {
         return getMemberComparison({offset: '{offset}'})
-          .then(() => verify(api.get(
-            anything(),
-            '{offset}'
-          )));
+          .then(() => verify(api.get(anything(), '{offset}')));
       });
 
       it('rejects with an invalid first member ID', () => {
@@ -433,18 +349,12 @@ describe('pro-publica-congress', () => {
 
       it('validates against the 101st congress as the earliest for the senate', () => {
         return getMemberComparison({chamber: 'senate'})
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            101
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 101)));
       });
 
       it('validates against the 102nd congress as the earliest for the house', () => {
         return getMemberComparison({chamber: 'house'})
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            102
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 102)));
       });
 
       it('rejects with representative comparisons before the 102nd congress', () => {
@@ -459,13 +369,10 @@ describe('pro-publica-congress', () => {
 
       it('validates against member comparison types', () => {
         return getMemberComparison()
-          .then(() => verify(validators.isValidType(
-            '{member-comparison-type}',
-            [
-              'bills',
-              'votes',
-            ]
-          )));
+          .then(() => verify(validators.isValidType('{member-comparison-type}', [
+            'bills',
+            'votes',
+          ])));
       });
 
       it('rejects with an invalid member comparison type', () => {
@@ -477,9 +384,7 @@ describe('pro-publica-congress', () => {
     describe('.getCurrentSenators()', () => {
       it("performs a request to an endpoint resembling 'members/senate/{state}/current'", () => {
         return ppc.getCurrentSenators('{state}')
-          .then(() => looseVerify(api.get(
-            'members/senate/{state}/current'
-          )));
+          .then(() => looseVerify(api.get('members/senate/{state}/current')));
       });
 
       it('rejects with an invalid state', () => {
@@ -491,9 +396,7 @@ describe('pro-publica-congress', () => {
     describe('.getCurrentRepresentatives()', () => {
       it("performs a request to an endpoint resembling 'members/house/{state}/{district}/current'", () => {
         return ppc.getCurrentRepresentatives('{state}', '{district}')
-          .then(() => looseVerify(api.get(
-            'members/house/{state}/{district}/current'
-          )));
+          .then(() => looseVerify(api.get('members/house/{state}/{district}/current')));
       });
 
       it('rejects with an invalid state', () => {
@@ -510,24 +413,17 @@ describe('pro-publica-congress', () => {
     describe('.getLeavingMembers()', () => {
       it("performs a request to an endpoint resembling '{congress}/{chamber}/members/leaving'", () => {
         return ppc.getLeavingMembers('{chamber}')
-          .then(() => looseVerify(api.get(
-            '{congress}/{chamber}/members/leaving'
-          )));
+          .then(() => looseVerify(api.get('{congress}/{chamber}/members/leaving')));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getLeavingMembers('{chamber}', {congress: '{different-congress}'})
-          .then(() => looseVerify(api.get(
-            '{different-congress}/{chamber}/members/leaving'
-          )));
+          .then(() => looseVerify(api.get('{different-congress}/{chamber}/members/leaving')));
       });
 
       it('validates against the 111th congress as the earliest', () => {
         return ppc.getLeavingMembers('{chamber}')
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            111
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 111)));
       });
 
       it('rejects with an invalid congress', () => {
@@ -542,38 +438,27 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getLeavingMembers('{chamber}')
-          .then(() => verify(api.get(
-            anything(),
-            0
-          )));
+          .then(() => verify(api.get(anything(), 0)));
       });
 
       it('sets the given offset', () => {
         return ppc.getLeavingMembers('{chamber}', {offset: '{offset}'})
-          .then(() => verify(api.get(
-            anything(),
-            '{offset}'
-          )));
+          .then(() => verify(api.get(anything(), '{offset}')));
       });
     });
 
     describe('.getBillsByMember()', () => {
       it("performs a request to an endpoint resembling 'members/{member-id}/bills/{member-bill-type}'", () => {
         return ppc.getBillsByMember('{member-id}', '{member-bill-type}')
-          .then(() => looseVerify(api.get(
-            'members/{member-id}/bills/{member-bill-type}'
-          )));
+          .then(() => looseVerify(api.get('members/{member-id}/bills/{member-bill-type}')));
       });
 
       it('validates against member bill types', () => {
         return ppc.getBillsByMember('{member-id}', '{member-bill-type}')
-          .then(() => verify(validators.isValidType(
-            '{member-bill-type}',
-            [
-              'introduced',
-              'updated'
-            ]
-          )));
+          .then(() => verify(validators.isValidType('{member-bill-type}', [
+            'introduced',
+            'updated'
+          ])));
       });
 
       it('rejects with an invalid member bill type', () => {
@@ -588,50 +473,34 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getBillsByMember('{chamber}', '{recent-bill-type}')
-          .then(() => verify(api.get(
-            anything(),
-            0
-          )));
+          .then(() => verify(api.get(anything(), 0)));
       });
 
       it('sets the given offset', () => {
         return ppc.getBillsByMember('{chamber}', '{recent-bill-type}', {offset: '{offset}'})
-          .then(() => verify(api.get(
-            anything(),
-            '{offset}'
-          )));
+          .then(() => verify(api.get(anything(), '{offset}')));
       });
     });
 
     describe('.getRollCallVotes()', () => {
       it("performs a request to an endpoint resembling '{congress}/{chamber}/sessions/{session-number}/votes/{roll-call-number}'", () => {
         return ppc.getRollCallVotes('{chamber}', '{session-number}', '{roll-call-number}')
-          .then(() => looseVerify(api.get(
-            '{congress}/{chamber}/sessions/{session-number}/votes/{roll-call-number}'
-          )));
+          .then(() => looseVerify(api.get('{congress}/{chamber}/sessions/{session-number}/votes/{roll-call-number}')));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getRollCallVotes('{chamber}', '{session-number}', '{roll-call-number}', {congress: '{different-congress}'})
-          .then(() => looseVerify(api.get(
-            '{different-congress}/{chamber}/sessions/{session-number}/votes/{roll-call-number}'
-          )));
+          .then(() => looseVerify(api.get('{different-congress}/{chamber}/sessions/{session-number}/votes/{roll-call-number}')));
       });
 
       it('validates against the 102nd congress as the earliest for the house', () => {
         return ppc.getRollCallVotes('house', '{session-number}', '{roll-call-number}', {congress: '{different-congress}'})
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            102
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 102)));
       });
 
       it('validates against the 101st congress as the earliest for the senate', () => {
         return ppc.getRollCallVotes('senate', '{session-number}', '{roll-call-number}', {congress: '{different-congress}'})
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            101
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 101)));
       });
 
       it('rejects with an invalid congress', () => {
@@ -658,9 +527,7 @@ describe('pro-publica-congress', () => {
     describe('.getVotesByDate()', () => {
       it("performs a request to an endpoint resembling '{chamber}/votes/{year}/{month}'", () => {
         return ppc.getVotesByDate('{chamber}', '{year}', '{month}')
-          .then(() => looseVerify(api.get(
-            '{chamber}/votes/{year}/{month}'
-          )));
+          .then(() => looseVerify(api.get('{chamber}/votes/{year}/{month}')));
       });
 
       it('rejects with an invalid chamber', () => {
@@ -682,32 +549,22 @@ describe('pro-publica-congress', () => {
     describe('.getVotes()', () => {
       it("performs a request to an endpoint resembling '{congress}/{chamber}/votes/{vote-type}'", () => {
         return ppc.getVotes('{chamber}', '{vote-type}')
-          .then(() => looseVerify(api.get(
-            '{congress}/{chamber}/votes/{vote-type}'
-          )));
+          .then(() => looseVerify(api.get('{congress}/{chamber}/votes/{vote-type}')));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getVotes('{chamber}', '{vote-type}', {congress: '{different-congress}'})
-          .then(() => looseVerify(api.get(
-            '{different-congress}/{chamber}/votes/{vote-type}'
-          )));
+          .then(() => looseVerify(api.get('{different-congress}/{chamber}/votes/{vote-type}')));
       });
 
       it('validates against the 102nd congress as the earliest for the house', () => {
         return ppc.getVotes('house', '{vote-type}')
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            102
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 102)));
       });
 
       it('validates against the 101st congress as the earliest for the senate', () => {
         return ppc.getVotes('senate', '{vote-type}')
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            101
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 101)));
       });
 
       it('rejects with an invalid congress', () => {
@@ -722,15 +579,12 @@ describe('pro-publica-congress', () => {
 
       it('validates against vote types', () => {
         return ppc.getVotes('{chamber}', '{vote-type}')
-          .then(() => verify(validators.isValidType(
-            '{vote-type}',
-            [
-              'missed',
-              'party',
-              'loneno',
-              'perfect'
-            ]
-          )));
+          .then(() => verify(validators.isValidType('{vote-type}', [
+            'missed',
+            'party',
+            'loneno',
+            'perfect'
+          ])));
       });
 
       it('rejects with an invalid vote type', () => {
@@ -740,42 +594,29 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getVotes('{chamber}', '{vote-type}')
-          .then(() => verify(api.get(
-            anything(),
-            0
-          )));
+          .then(() => verify(api.get(anything(), 0)));
       });
 
       it('sets the given offset', () => {
         return ppc.getVotes('{chamber}', '{vote-type}', {offset: '{offset}'})
-          .then(() => verify(api.get(
-            anything(),
-            '{offset}'
-          )));
+          .then(() => verify(api.get(anything(), '{offset}')));
       });
     });
 
     describe('.getSenateNominationVotes()', () => {
       it("performs a request to an endpoint resembling '{congress}/nominations'", () => {
         return ppc.getSenateNominationVotes()
-          .then(() => looseVerify(api.get(
-            '{congress}/nominations'
-          )));
+          .then(() => looseVerify(api.get('{congress}/nominations')));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getSenateNominationVotes({congress: '{different-congress}'})
-          .then(() => looseVerify(api.get(
-            '{different-congress}/nominations'
-          )));
+          .then(() => looseVerify(api.get('{different-congress}/nominations')));
       });
 
       it('validates against the 101st congress as the earliest', () => {
         return ppc.getSenateNominationVotes()
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            101
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 101)));
       });
 
       it('rejects with an invalid congress', () => {
@@ -785,42 +626,29 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getSenateNominationVotes()
-          .then(() => verify(api.get(
-            anything(),
-            0
-          )));
+          .then(() => verify(api.get(anything(), 0)));
       });
 
       it('sets the given offset', () => {
         return ppc.getSenateNominationVotes({offset: '{offset}'})
-          .then(() => verify(api.get(
-            anything(),
-            '{offset}'
-          )));
+          .then(() => verify(api.get(anything(), '{offset}')));
       });
     });
 
     describe('.getNominees()', () => {
       it("performs a request to an endpoint resembling '{congress}/nominees/{nominee-type}'", () => {
         return ppc.getNominees('{nominee-type}')
-          .then(() => looseVerify(api.get(
-            '{congress}/nominees/{nominee-type}'
-          )));
+          .then(() => looseVerify(api.get('{congress}/nominees/{nominee-type}')));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getNominees('{nominee-type}', {congress: '{different-congress}'})
-          .then(() => looseVerify(api.get(
-            '{different-congress}/nominees/{nominee-type}'
-          )));
+          .then(() => looseVerify(api.get('{different-congress}/nominees/{nominee-type}')));
       });
 
       it('validates against the 107st congress as the earliest', () => {
         return ppc.getNominees('{nominee-type}')
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            107
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 107)));
       });
 
       it('rejects with an invalid congress', () => {
@@ -830,15 +658,12 @@ describe('pro-publica-congress', () => {
 
       it('validates against nominee types', () => {
         return ppc.getNominees('{nominee-type}')
-          .then(() => verify(validators.isValidType(
-            '{nominee-type}',
-            [
-              'received',
-              'updated',
-              'confirmed',
-              'withdrawn'
-            ]
-          )));
+          .then(() => verify(validators.isValidType('{nominee-type}', [
+            'received',
+            'updated',
+            'confirmed',
+            'withdrawn'
+          ])));
       });
 
       it('rejects with an invalid nominee type', () => {
@@ -850,24 +675,17 @@ describe('pro-publica-congress', () => {
     describe('.getNomineesByState()', () => {
       it("performs a request to an endpoint resembling '{congress}/nominees/state/{state}'", () => {
         return ppc.getNomineesByState('{state}')
-          .then(() => looseVerify(api.get(
-            '{congress}/nominees/state/{state}'
-          )));
+          .then(() => looseVerify(api.get('{congress}/nominees/state/{state}')));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getNomineesByState('{state}', {congress: '{different-congress}'})
-          .then(() => looseVerify(api.get(
-            '{different-congress}/nominees/state/{state}'
-          )));
+          .then(() => looseVerify(api.get('{different-congress}/nominees/state/{state}')));
       });
 
       it('validates against the 107st congress as the earliest', () => {
         return ppc.getNomineesByState('{state}')
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            107
-          )));
+          .then(() => verify(validators.isValidCongress(anything(),107)));
       });
 
       it('rejects with an invalid congress', () => {
@@ -884,33 +702,24 @@ describe('pro-publica-congress', () => {
     describe('.getPartyCounts()', () => {
       it("performs a request to an endpoint resembling 'states/members/party'", () => {
         return ppc.getPartyCounts()
-          .then(() => looseVerify(api.get(
-            'states/members/party'
-          )));
+          .then(() => looseVerify(api.get('states/members/party')));
       });
     });
 
     describe('.getCommittees()', () => {
       it("performs a request to an endpoint resembling '{congress}/{chamber}/committees'", () => {
         return ppc.getCommittees('{chamber}')
-          .then(() => looseVerify(api.get(
-            '{congress}/{chamber}/committees'
-          )));
+          .then(() => looseVerify(api.get('{congress}/{chamber}/committees')));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getCommittees('{chamber}', {congress: '{different-congress}'})
-          .then(() => looseVerify(api.get(
-            '{different-congress}/{chamber}/committees'
-          )));
+          .then(() => looseVerify(api.get('{different-congress}/{chamber}/committees')));
       });
     
       it('validates against the 110th congress as the earliest', () => {
         return ppc.getCommittees('{chamber}')
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            110
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 110)));
       });
     
       it('rejects with an invalid congress', () => {
@@ -925,42 +734,29 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getCommittees('{chamber}')
-          .then(() => verify(api.get(
-            anything(),
-            0
-          )));
+          .then(() => verify(api.get(anything(), 0)));
       });
 
       it('sets the given offset', () => {
         return ppc.getCommittees('{chamber}', {offset: '{offset}'})
-          .then(() => verify(api.get(
-            anything(),
-            '{offset}'
-          )));
+          .then(() => verify(api.get(anything(), '{offset}')));
       });
     });
 
     describe('.getCommitteeMembers()', () => {
       it("performs a request to an endpoint resembling '{congress}/{chamber}/committees/{committee-id}'", () => {
         return ppc.getCommitteeMembers('{chamber}', '{committee-id}')
-          .then(() => looseVerify(api.get(
-            '{congress}/{chamber}/committees/{committee-id}'
-          )));
+          .then(() => looseVerify(api.get('{congress}/{chamber}/committees/{committee-id}')));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getCommitteeMembers('{chamber}', '{committee-id}', {congress: '{different-congress}'})
-          .then(() => looseVerify(api.get(
-            '{different-congress}/{chamber}/committees/{committee-id}'
-          )));
+          .then(() => looseVerify(api.get('{different-congress}/{chamber}/committees/{committee-id}')));
       });
 
       it('validates against the 110th congress as the earliest', () => {
         return ppc.getCommitteeMembers('{chamber}', '{committee-id}')
-          .then(() => verify(validators.isValidCongress(
-            anything(),
-            110
-          )));
+          .then(() => verify(validators.isValidCongress(anything(), 110)));
       });
 
       it('rejects with an invalid congress', () => {
@@ -980,18 +776,12 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getCommitteeMembers('{chamber}', '{committee-id}')
-          .then(() => verify(api.get(
-            anything(),
-            0
-          )));
+          .then(() => verify(api.get(anything(), 0)));
       });
 
       it('sets the given offset', () => {
         return ppc.getCommitteeMembers('{chamber}', '{committee-id}', {offset: '{offset}'})
-          .then(() => verify(api.get(
-            anything(),
-            '{offset}'
-          )));
+          .then(() => verify(api.get(anything(), '{offset}')));
       });
     });
   });
