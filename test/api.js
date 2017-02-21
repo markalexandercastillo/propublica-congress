@@ -11,12 +11,12 @@ require('chai').use(require('chai-as-promised')).should();
 const ignoringWhen = fakeInvocation => when(fakeInvocation, {ignoreExtraArgs: true});
 const ignoringVerify = fakeInvocation => verify(fakeInvocation, {ignoreExtraArgs: true});
 
-describe('client', () => {
-  let http, createClient, validators;
+describe('api', () => {
+  let http, createApi, validators;
   beforeEach(() => {
     http = replace('./../src/http');
     validators = replace('./../src/validators');
-    createClient = require('./../src/client').create;
+    createApi = require('./../src/api').create;
 
     // validation invocations pass by default
     ignoringWhen(validators.isValidOffset())
@@ -29,29 +29,29 @@ describe('client', () => {
   describe('create()', () => {
     it(
       "sets .key to the given key",
-      () => createClient('SOME_KEY').key.should.equal('SOME_KEY')
+      () => createApi('SOME_KEY').key.should.equal('SOME_KEY')
     );
 
     it('throws with an invalid key', () => {
       when(validators.isValidApiKey(anything()))
         .thenReturn(false);
 
-      (() => createClient())
+      (() => createApi())
         .should.throw(Error, 'Received invalid API key:');
     });
   });
 
   describe('.get()', () => {
-    let client;
+    let api;
     beforeEach(() => {
-      client = createClient('SOME_KEY');
+      api = createApi('SOME_KEY');
 
       ignoringWhen(http.get())
         .thenResolve({});
     });
 
     it("sets the 'X-API-Key' header with the given key", () => {
-      return client.get('some/endpoint')
+      return api.get('some/endpoint')
         .then(() => verify(http.get(
           anything(),
           contains({headers: {'X-API-Key': 'SOME_KEY'}})
@@ -59,7 +59,7 @@ describe('client', () => {
     });
 
     it("expects a JSON response", () => {
-      return client.get('some/endpoint')
+      return api.get('some/endpoint')
         .then(() => verify(http.get(
           anything(),
           contains({json: true})
@@ -67,7 +67,7 @@ describe('client', () => {
     });
 
     it("sets an offset from the second argument", () => {
-      return client.get('some/endpoint', 20)
+      return api.get('some/endpoint', 20)
         .then(() => verify(http.get(
           anything(),
           contains({body: {offset: 20}})
@@ -75,21 +75,21 @@ describe('client', () => {
     });
 
     it("performs the request to the ProPublica API host", () => {
-      return client.get('some/endpoint')
+      return api.get('some/endpoint')
         .then(() => ignoringVerify(http.get(
           argThat(url => url.indexOf('https://api.propublica.org') === 0)
         )));
     });
 
     it("performs the request to version 1 of ProPublica's Congres API", () => {
-      return client.get('some/endpoint')
+      return api.get('some/endpoint')
         .then(() => ignoringVerify(http.get(
           argThat(url => URL.parse(url).path.indexOf('/congress/v1/') === 0)
         )));
     });
 
     it("performs the request to the JSON variant of the endpoint", () => {
-      return client.get('some/endpoint')
+      return api.get('some/endpoint')
         .then(() => ignoringVerify(http.get(
           argThat(url => url.substr(-'some/endpoint.json'.length) === 'some/endpoint.json')
         )));
@@ -99,7 +99,7 @@ describe('client', () => {
       when(validators.isValidOffset('an invalid offset'))
         .thenReturn(false);
 
-      return client.get('some/endpoint', 'an invalid offset')
+      return api.get('some/endpoint', 'an invalid offset')
         .should.be.rejectedWith(Error, 'Received invalid offset:');
     });
 
@@ -107,7 +107,7 @@ describe('client', () => {
       ignoringWhen(http.get())
         .thenResolve({body: 'some body data'});
 
-      return client.get('some/endpoint').should.become('some body data');
+      return api.get('some/endpoint').should.become('some body data');
     });
   });
 });

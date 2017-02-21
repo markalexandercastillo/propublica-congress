@@ -1,6 +1,6 @@
 const {create, assign, keys} = Object
   , {stringify} = JSON
-  , client = require('./client')
+  , api = require('./api')
   , validators = require('./validators');
 
 /**
@@ -97,7 +97,7 @@ const proto = {
       validate.chamber(chamber),
       validate.congress(congress, 110),
       validate.committeeId(committeeId)
-    ]).then(() => this.client.get(`${congress}/${chamber}/committees/${committeeId}`, offset));
+    ]).then(() => this.api.get(`${congress}/${chamber}/committees/${committeeId}`, offset));
   },
   /**
    * Resolves to a list of presidential civilian nominations of individuals from a specific state.
@@ -111,7 +111,7 @@ const proto = {
     return Promise.all([
       validate.state(state),
       validate.congress(congress, 107)
-    ]).then(() => this.client.get(`${congress}/nominees/state/${state}`));
+    ]).then(() => this.api.get(`${congress}/nominees/state/${state}`));
   },
   /**
    * Resolves to all votes in a particular month.
@@ -127,7 +127,7 @@ const proto = {
       validate.chamber(chamber),
       validate.year(year),
       validate.month(month)
-    ]).then(() => this.client.get(`${chamber}/votes/${year}/${month}`));
+    ]).then(() => this.api.get(`${chamber}/votes/${year}/${month}`));
   },
   /**
    * Resolves to a specific roll-call vote, including a complete list of member positions.
@@ -144,7 +144,7 @@ const proto = {
       validate.rollCallNumber(rollCallNumber),
       validate.sessionNumber(sessionNumber),
       validate.chamber(chamber).then(() => validate.congress(congress, {house: 102, senate: 101}[chamber]))
-    ]).then(() => this.client.get(`${congress}/${chamber}/sessions/${sessionNumber}/votes/${rollCallNumber}`));
+    ]).then(() => this.api.get(`${congress}/${chamber}/sessions/${sessionNumber}/votes/${rollCallNumber}`));
   },
   /**
    * Resolves to the 20 bills most recently introduced or updated by a particular member. Results
@@ -160,7 +160,7 @@ const proto = {
     return Promise.all([
       validate.memberId(memberId),
       validate.type(memberBillType, memberBillTypes, 'member bill type')
-    ]).then(() => this.client.get(`members/${memberId}/bills/${memberBillType}`, offset));
+    ]).then(() => this.api.get(`members/${memberId}/bills/${memberBillType}`, offset));
   },
   /**
    * Resolves to the current members of the house of representatives for the given state and
@@ -175,7 +175,7 @@ const proto = {
     return Promise.all([
       validate.state(state),
       validate.district(district)
-    ]).then(() => this.client.get(`members/house/${state}/${district}/current`));
+    ]).then(() => this.api.get(`members/house/${state}/${district}/current`));
   },
   /**
    * Resolves to the current members of the senate for the given state
@@ -186,7 +186,7 @@ const proto = {
    */
   getCurrentSenators(state) {
     return validate.state(state)
-      .then(() => this.client.get(`members/senate/${state}/current`));
+      .then(() => this.api.get(`members/senate/${state}/current`));
   },
   /**
    * Resolves to a list of members who have left the Senate or House or have announced plans to do
@@ -201,7 +201,7 @@ const proto = {
     return Promise.all([
       validate.congress(congress, 111),
       validate.chamber(chamber)
-    ]).then(() => this.client.get(`${congress}/${chamber}/members/leaving`, offset));
+    ]).then(() => this.api.get(`${congress}/${chamber}/members/leaving`, offset));
   },
   /**
    * You can get vote information in four categories: missed votes, party votes, lone no votes and
@@ -223,7 +223,7 @@ const proto = {
     return Promise.all([
       validate.type(voteType, voteTypes, 'vote type'),
       validate.chamber(chamber).then(() => validate.congress(congress, {senate: 101, house: 102}[chamber]))
-    ]).then(() => this.client.get(`${congress}/${chamber}/votes/${voteType}`, offset));
+    ]).then(() => this.api.get(`${congress}/${chamber}/votes/${voteType}`, offset));
   },
   /**
    * Resolves to Senate votes on presidential nominations
@@ -234,7 +234,7 @@ const proto = {
    */
   getSenateNominationVotes({congress = this.congress, offset = 0} = {}) {
     return validate.congress(congress, 101)
-      .then(() => this.client.get(`${congress}/nominations`, offset));
+      .then(() => this.api.get(`${congress}/nominations`, offset));
   },
   /**
    * Resolves to lists of presidential nominations for civilian positions
@@ -248,7 +248,7 @@ const proto = {
     return Promise.all([
       validate.congress(congress, 107),
       validate.type(nomineeType, nomineeTypes, 'nominee type')
-    ]).then(() => this.client.get(`${congress}/nominees/${nomineeType}`));
+    ]).then(() => this.api.get(`${congress}/nominees/${nomineeType}`));
   },
   /**
    * Resolves to party membership counts for all states (current Congress only)
@@ -257,7 +257,7 @@ const proto = {
    * @returns {Promise}
    */
   getPartyCounts() {
-    return this.client.get('states/members/party');
+    return this.api.get('states/members/party');
   },
   /**
    * Resolves to a list of Senate or House committees.
@@ -271,7 +271,7 @@ const proto = {
     return Promise.all([
       validate.congress(congress, 110),
       validate.chamber(chamber)
-    ]).then(() => this.client.get(`${congress}/${chamber}/committees`, offset));
+    ]).then(() => this.api.get(`${congress}/${chamber}/committees`, offset));
   },
   /**
    * Resolves to a comparison of bill sponsorship or vote positions between two members who served
@@ -294,7 +294,7 @@ const proto = {
       validate.chamber(chamber).then(() => validate.congress(congress, {senate: 101, house: 102}[chamber]))
     ]).then(() => {
       const endpoint = `members/${firstMemberId}/${memberComparisonType}/${secondMemberId}/${congress}/${chamber}`;
-      return this.client.get(endpoint, offset);
+      return this.api.get(endpoint, offset);
     });
   },
   /**
@@ -308,7 +308,7 @@ const proto = {
    */
   getVotesByMember(memberId, {offset = 0} = {}) {
     return validate.memberId(memberId)
-      .then(() => this.client.get(`members/${memberId}/votes`, offset));
+      .then(() => this.api.get(`members/${memberId}/votes`, offset));
   },
   /**
    * Resolves to a list of the most recent new members of the current Congress.
@@ -318,7 +318,7 @@ const proto = {
    * @returns {Promise}
    */
   getNewMembers({offset = 0} = {}) {
-    return this.client.get('members/new', offset);
+    return this.api.get('members/new', offset);
   },
   /**
    * Resolves to a list of members of a particular chamber in a particular Congress.
@@ -331,7 +331,7 @@ const proto = {
   getMemberList(chamber, {congress = this.congress, offset = 0} = {}) {
     return validate.chamber(chamber)
       .then(() => validate.congress(congress, {senate: 80, house: 102}[chamber]))
-      .then(() => this.client.get(`${congress}/${chamber}/members`, offset));
+      .then(() => this.api.get(`${congress}/${chamber}/members`, offset));
   },
   /**
    * Resolves to additional details about a particular bill of the given type.
@@ -348,7 +348,7 @@ const proto = {
       validate.congress(congress, 105),
       validate.billId(billId),
       validate.type(additionalBillDetailType, additionalBillDetailTypes, 'additional bill detail type')
-    ]).then(() => this.client.get(`${congress}/bills/${billId}/${additionalBillDetailType}`, offset));
+    ]).then(() => this.api.get(`${congress}/bills/${billId}/${additionalBillDetailType}`, offset));
   },
   /**
    * Resolves to details about a particular bill, including actions taken and votes.
@@ -362,7 +362,7 @@ const proto = {
     return Promise.all([
       validate.congress(congress, 105),
       validate.billId(billId)
-    ]).then(() => this.client.get(`${congress}/bills/${billId}`));
+    ]).then(() => this.api.get(`${congress}/bills/${billId}`));
   },
   /**
    * Resolves to summaries of the 20 most recent bills by type. For the current Congress,
@@ -380,7 +380,7 @@ const proto = {
       validate.chamber(chamber),
       validate.congress(congress, 105),
       validate.type(recentBillType, recentBillTypes, 'recent bill type')
-    ]).then(() => this.client.get(`${congress}/${chamber}/bills/${recentBillType}`, offset));
+    ]).then(() => this.api.get(`${congress}/${chamber}/bills/${recentBillType}`, offset));
   }
 };
 
@@ -391,7 +391,7 @@ module.exports = {
     }
     return assign(create(proto), {
       congress,
-      client: client.create(key)
+      api: api.create(key)
     });
   }
 };

@@ -10,9 +10,9 @@ const ignoringWhen = fakeInvocation => when(fakeInvocation, {ignoreExtraArgs: tr
 const ignoringVerify = fakeInvocation => verify(fakeInvocation, {ignoreExtraArgs: true});
 
 describe('pro-publica-congress', () => {
-  let clientModule, validators, createPpc;
+  let apiModule, validators, createPpc;
   beforeEach(() => {
-    clientModule = replace('./../src/client');
+    apiModule = replace('./../src/api');
     validators = replace('./../src/validators');
     createPpc = require('./../src/index').create;
 
@@ -41,24 +41,24 @@ describe('pro-publica-congress', () => {
         .should.throw(Error, 'Received invalid congress:');
     });
 
-    it("sets a 'client' property to a client created with the given key argument", () => {
+    it("sets a 'api' property to a api created with the given key argument", () => {
       const expectedClient = {};
-      when(clientModule.create('PROPUBLICA_API_KEY'))
+      when(apiModule.create('PROPUBLICA_API_KEY'))
         .thenReturn(expectedClient);
 
-      createPpc('PROPUBLICA_API_KEY', '{congress}').client
+      createPpc('PROPUBLICA_API_KEY', '{congress}').api
         .should.equal(expectedClient);
     });
   });
 
   describe('instance methods', () => {
-    let ppc, client;
+    let ppc, api;
     beforeEach(() => {
-      client = object(['get']);
-      when(clientModule.create(anything()))
-        .thenReturn(client);
+      api = object(['get']);
+      when(apiModule.create(anything()))
+        .thenReturn(api);
 
-      ignoringWhen(client.get())
+      ignoringWhen(api.get())
         .thenResolve({});
 
       ppc = createPpc('PROPUBLICA_API_KEY', '{congress}');
@@ -67,21 +67,21 @@ describe('pro-publica-congress', () => {
     describe('.getRecentBills()', () => {
       it("performs a request to an endpoint resembling '{congress}/{chamber}/bills/{recent-bill-type}'", () => {
         return ppc.getRecentBills('{chamber}', '{recent-bill-type}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{congress}/{chamber}/bills/{recent-bill-type}'
           )));
       });
 
       it("performs request to the endpoint respecting the given congress", () => {
         return ppc.getRecentBills('{chamber}', '{recent-bill-type}', {congress: '{different-congress}'})
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{different-congress}/{chamber}/bills/{recent-bill-type}'
           )));
       });
 
       it('sets the offset to 0 by default', () => {
         return ppc.getRecentBills('{chamber}', '{recent-bill-type}')
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             0
           )));
@@ -89,7 +89,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the given offset', () => {
         return ppc.getRecentBills('{chamber}', '{recent-bill-type}', {offset: '{offset}'})
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             '{offset}'
           )));
@@ -135,14 +135,14 @@ describe('pro-publica-congress', () => {
     describe('.getBill()', () => {
       it("performs a request to an endpoint resembling '{congress}/bills/{bill-id}'", () => {
         return ppc.getBill('{bill-id}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{congress}/bills/{bill-id}'
           )));
       });
 
       it("performs request to the endpoint respecting the given congress", () => {
         return ppc.getBill('{bill-id}', {congress: '{different-congress}'})
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{different-congress}/bills/{bill-id}'
           )));
       });
@@ -169,14 +169,14 @@ describe('pro-publica-congress', () => {
     describe('.getAdditionalBillDetails()', () => {
       it("performs a request to an endpoint resembling '{congress}/bills/{bill-id}/{additional-bill-detail-type}'", () => {
         return ppc.getAdditionalBillDetails('{bill-id}', '{additional-bill-detail-type}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{congress}/bills/{bill-id}/{additional-bill-detail-type}'
           )));
       });
 
       it("performs request to the endpoint respecting the given congress", () => {
         return ppc.getAdditionalBillDetails('{bill-id}', '{additional-bill-detail-type}', {congress: '{different-congress}'})
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{different-congress}/bills/{bill-id}/{additional-bill-detail-type}'
           )));
       });
@@ -219,7 +219,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getAdditionalBillDetails('{bill-id}', '{additional-bill-detail-type}')
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             0
           )));
@@ -227,7 +227,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the given offset', () => {
         return ppc.getAdditionalBillDetails('{bill-id}', '{additional-bill-detail-type}', {offset: '{offset}'})
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             '{offset}'
           )));
@@ -237,21 +237,21 @@ describe('pro-publica-congress', () => {
     describe('.getMemberList()', () => {
       it("performs a request to an endpoint resembling '{congress}/{chamber}/members'", () => {
         return ppc.getMemberList('{chamber}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{congress}/{chamber}/members'
           )));
       });
 
       it("performs request to the endpoint respecting the given congress", () => {
         return ppc.getMemberList('{chamber}', {congress: '{different-congress}'})
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{different-congress}/{chamber}/members'
           )));
       });
 
       it('sets the offset to 0 by default', () => {
         return ppc.getMemberList('{chamber}')
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             0
           )));
@@ -259,7 +259,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the given offset', () => {
         return ppc.getMemberList('{chamber}', {offset: '{offset}'})
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             '{offset}'
           )));
@@ -300,14 +300,14 @@ describe('pro-publica-congress', () => {
     describe('.getNewMembers()', () => {
       it("performs a request to an endpoint resembling 'members/new'", () => {
         return ppc.getNewMembers()
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             'members/new'
           )));
       });
 
       it('sets the offset to 0 by default', () => {
         return ppc.getNewMembers()
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             0
           )));
@@ -315,7 +315,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the given offset', () => {
         return ppc.getNewMembers({offset: '{offset}'})
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             '{offset}'
           )));
@@ -325,7 +325,7 @@ describe('pro-publica-congress', () => {
     describe('.getVotesByMember()', () => {
       it("performs a request to an endpoint resembling 'members/{member-id}/votes'", () => {
         return ppc.getVotesByMember('{member-id}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             'members/{member-id}/votes'
           )));
       });
@@ -337,7 +337,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getVotesByMember('{member-id}')
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             0
           )));
@@ -345,7 +345,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the given offset', () => {
         return ppc.getVotesByMember('{member-id}', {offset: '{offset}'})
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             '{offset}'
           )));
@@ -388,21 +388,21 @@ describe('pro-publica-congress', () => {
 
       it("performs request to an endpoint resembling 'members/{first-member-id}/{member-comparison-type}/{second-member-id}/{congress}/{chamber}'", () => {
         return getMemberComparison()
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             'members/{member-id}/{member-comparison-type}/{second-member-id}/{congress}/{chamber}'
           )));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return getMemberComparison({congress: '{different-congress}'})
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             'members/{member-id}/{member-comparison-type}/{second-member-id}/{different-congress}/{chamber}'
           )));
       });
 
       it('sets the offset to 0 by default', () => {
         return getMemberComparison()
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             0
           )));
@@ -410,7 +410,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the given offset', () => {
         return getMemberComparison({offset: '{offset}'})
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             '{offset}'
           )));
@@ -477,7 +477,7 @@ describe('pro-publica-congress', () => {
     describe('.getCurrentSenators()', () => {
       it("performs a request to an endpoint resembling 'members/senate/{state}/current'", () => {
         return ppc.getCurrentSenators('{state}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             'members/senate/{state}/current'
           )));
       });
@@ -491,7 +491,7 @@ describe('pro-publica-congress', () => {
     describe('.getCurrentRepresentatives()', () => {
       it("performs a request to an endpoint resembling 'members/house/{state}/{district}/current'", () => {
         return ppc.getCurrentRepresentatives('{state}', '{district}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             'members/house/{state}/{district}/current'
           )));
       });
@@ -510,14 +510,14 @@ describe('pro-publica-congress', () => {
     describe('.getLeavingMembers()', () => {
       it("performs a request to an endpoint resembling '{congress}/{chamber}/members/leaving'", () => {
         return ppc.getLeavingMembers('{chamber}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{congress}/{chamber}/members/leaving'
           )));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getLeavingMembers('{chamber}', {congress: '{different-congress}'})
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{different-congress}/{chamber}/members/leaving'
           )));
       });
@@ -542,7 +542,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getLeavingMembers('{chamber}')
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             0
           )));
@@ -550,7 +550,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the given offset', () => {
         return ppc.getLeavingMembers('{chamber}', {offset: '{offset}'})
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             '{offset}'
           )));
@@ -560,7 +560,7 @@ describe('pro-publica-congress', () => {
     describe('.getBillsByMember()', () => {
       it("performs a request to an endpoint resembling 'members/{member-id}/bills/{member-bill-type}'", () => {
         return ppc.getBillsByMember('{member-id}', '{member-bill-type}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             'members/{member-id}/bills/{member-bill-type}'
           )));
       });
@@ -588,7 +588,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getBillsByMember('{chamber}', '{recent-bill-type}')
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             0
           )));
@@ -596,7 +596,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the given offset', () => {
         return ppc.getBillsByMember('{chamber}', '{recent-bill-type}', {offset: '{offset}'})
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             '{offset}'
           )));
@@ -606,14 +606,14 @@ describe('pro-publica-congress', () => {
     describe('.getRollCallVotes()', () => {
       it("performs a request to an endpoint resembling '{congress}/{chamber}/sessions/{session-number}/votes/{roll-call-number}'", () => {
         return ppc.getRollCallVotes('{chamber}', '{session-number}', '{roll-call-number}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{congress}/{chamber}/sessions/{session-number}/votes/{roll-call-number}'
           )));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getRollCallVotes('{chamber}', '{session-number}', '{roll-call-number}', {congress: '{different-congress}'})
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{different-congress}/{chamber}/sessions/{session-number}/votes/{roll-call-number}'
           )));
       });
@@ -658,7 +658,7 @@ describe('pro-publica-congress', () => {
     describe('.getVotesByDate()', () => {
       it("performs a request to an endpoint resembling '{chamber}/votes/{year}/{month}'", () => {
         return ppc.getVotesByDate('{chamber}', '{year}', '{month}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{chamber}/votes/{year}/{month}'
           )));
       });
@@ -682,14 +682,14 @@ describe('pro-publica-congress', () => {
     describe('.getVotes()', () => {
       it("performs a request to an endpoint resembling '{congress}/{chamber}/votes/{vote-type}'", () => {
         return ppc.getVotes('{chamber}', '{vote-type}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{congress}/{chamber}/votes/{vote-type}'
           )));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getVotes('{chamber}', '{vote-type}', {congress: '{different-congress}'})
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{different-congress}/{chamber}/votes/{vote-type}'
           )));
       });
@@ -740,7 +740,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getVotes('{chamber}', '{vote-type}')
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             0
           )));
@@ -748,7 +748,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the given offset', () => {
         return ppc.getVotes('{chamber}', '{vote-type}', {offset: '{offset}'})
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             '{offset}'
           )));
@@ -758,14 +758,14 @@ describe('pro-publica-congress', () => {
     describe('.getSenateNominationVotes()', () => {
       it("performs a request to an endpoint resembling '{congress}/nominations'", () => {
         return ppc.getSenateNominationVotes()
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{congress}/nominations'
           )));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getSenateNominationVotes({congress: '{different-congress}'})
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{different-congress}/nominations'
           )));
       });
@@ -785,7 +785,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getSenateNominationVotes()
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             0
           )));
@@ -793,7 +793,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the given offset', () => {
         return ppc.getSenateNominationVotes({offset: '{offset}'})
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             '{offset}'
           )));
@@ -803,14 +803,14 @@ describe('pro-publica-congress', () => {
     describe('.getNominees()', () => {
       it("performs a request to an endpoint resembling '{congress}/nominees/{nominee-type}'", () => {
         return ppc.getNominees('{nominee-type}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{congress}/nominees/{nominee-type}'
           )));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getNominees('{nominee-type}', {congress: '{different-congress}'})
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{different-congress}/nominees/{nominee-type}'
           )));
       });
@@ -850,14 +850,14 @@ describe('pro-publica-congress', () => {
     describe('.getNomineesByState()', () => {
       it("performs a request to an endpoint resembling '{congress}/nominees/state/{state}'", () => {
         return ppc.getNomineesByState('{state}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{congress}/nominees/state/{state}'
           )));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getNomineesByState('{state}', {congress: '{different-congress}'})
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{different-congress}/nominees/state/{state}'
           )));
       });
@@ -884,7 +884,7 @@ describe('pro-publica-congress', () => {
     describe('.getPartyCounts()', () => {
       it("performs a request to an endpoint resembling 'states/members/party'", () => {
         return ppc.getPartyCounts()
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             'states/members/party'
           )));
       });
@@ -893,14 +893,14 @@ describe('pro-publica-congress', () => {
     describe('.getCommittees()', () => {
       it("performs a request to an endpoint resembling '{congress}/{chamber}/committees'", () => {
         return ppc.getCommittees('{chamber}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{congress}/{chamber}/committees'
           )));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getCommittees('{chamber}', {congress: '{different-congress}'})
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{different-congress}/{chamber}/committees'
           )));
       });
@@ -925,7 +925,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getCommittees('{chamber}')
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             0
           )));
@@ -933,7 +933,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the given offset', () => {
         return ppc.getCommittees('{chamber}', {offset: '{offset}'})
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             '{offset}'
           )));
@@ -943,14 +943,14 @@ describe('pro-publica-congress', () => {
     describe('.getCommitteeMembers()', () => {
       it("performs a request to an endpoint resembling '{congress}/{chamber}/committees/{committee-id}'", () => {
         return ppc.getCommitteeMembers('{chamber}', '{committee-id}')
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{congress}/{chamber}/committees/{committee-id}'
           )));
       });
 
       it("performs request to an endpoint respecting the given congress", () => {
         return ppc.getCommitteeMembers('{chamber}', '{committee-id}', {congress: '{different-congress}'})
-          .then(() => ignoringVerify(client.get(
+          .then(() => ignoringVerify(api.get(
             '{different-congress}/{chamber}/committees/{committee-id}'
           )));
       });
@@ -980,7 +980,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the offset to 0 by default', () => {
         return ppc.getCommitteeMembers('{chamber}', '{committee-id}')
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             0
           )));
@@ -988,7 +988,7 @@ describe('pro-publica-congress', () => {
 
       it('sets the given offset', () => {
         return ppc.getCommitteeMembers('{chamber}', '{committee-id}', {offset: '{offset}'})
-          .then(() => verify(client.get(
+          .then(() => verify(api.get(
             anything(),
             '{offset}'
           )));
