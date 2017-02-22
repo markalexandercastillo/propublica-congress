@@ -390,6 +390,14 @@ const proto = {
 };
 
 module.exports = {
+  /**
+   * Factory for ProPublica Congress API wrapper object
+   *
+   * @param {String} key ProPublica API key
+   * @param {Number} [congress=CURRENT_CONGRESS] Reference congress to be used as the default
+   *                                             congress for any methods that take a congress
+   * @returns {Object}
+   */
   create(key, congress = CURRENT_CONGRESS) {
     if (congress && !validators.isValidCongress(congress)) {
       throw new Error(`Received invalid congress: ${stringify(congress)}`);
