@@ -4,7 +4,7 @@
  */
 
 const states = require('./states')
-  , CURRENT_CONGRESS = require('./CURRENT_CONGRESS');
+  , {CURRENT_CONGRESS} = require('./defaults');
 
 /**
  * Whether the argument is a valid offset to send to the ProPublica API

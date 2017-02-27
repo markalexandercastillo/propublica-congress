@@ -2,7 +2,7 @@ const {replace, when, verify, object, matchers: {
   anything,
   argThat
 }} = require('testdouble')
-  , CURRENT_CONGRESS = require('./../src/CURRENT_CONGRESS');
+  , {CURRENT_CONGRESS} = require('./../src/defaults');
 
 require('chai').use(require('chai-as-promised')).should();
 

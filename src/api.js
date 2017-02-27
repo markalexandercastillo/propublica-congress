@@ -6,10 +6,8 @@
 const {create, assign} = Object
   , {stringify} = JSON
   , http = require('./http')
-  , validators = require('./validators');
-
-const VERSION = '1';
-const HOST = 'https://api.propublica.org';
+  , validators = require('./validators')
+  , {API_VERSION, API_HOST} = require('./defaults');
 
 const proto = {
   /**
@@ -26,7 +24,7 @@ const proto = {
     const headers = {['X-API-Key']: this.key};
     const body = offset ? {offset} : {};
     return http.get(
-      `${HOST}/congress/v${VERSION}/${endpoint}.json`,
+      `${API_HOST}/congress/v${API_VERSION}/${endpoint}.json`,
       assign({headers, json: true}, {body})
     ).then(({body}) => body);
   }

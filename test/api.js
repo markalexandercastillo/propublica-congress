@@ -3,7 +3,8 @@ const {replace, when, verify, matchers: {
   contains,
   argThat
 }} = require('testdouble')
-  , URL = require('url');
+  , URL = require('url')
+  , {API_VERSION, API_HOST} = require('./../src/defaults');
 
 require('chai').use(require('chai-as-promised')).should();
 
@@ -77,14 +78,14 @@ describe('api', () => {
     it("performs the request to the ProPublica API host", () => {
       return api.get('some/endpoint')
         .then(() => looseVerify(http.get(
-          argThat(url => url.indexOf('https://api.propublica.org') === 0)
+          argThat(url => url.indexOf(API_HOST) === 0)
         )));
     });
 
-    it("performs the request to version 1 of ProPublica's Congres API", () => {
+    it("performs the request to version 1 of ProPublica's Congress API", () => {
       return api.get('some/endpoint')
         .then(() => looseVerify(http.get(
-          argThat(url => URL.parse(url).path.indexOf('/congress/v1/') === 0)
+          argThat(url => URL.parse(url).path.indexOf(`/congress/v${API_VERSION}/`) === 0)
         )));
     });
 

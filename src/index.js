@@ -2,7 +2,7 @@ const {create, assign, keys} = Object
   , {stringify} = JSON
   , api = require('./api')
   , validators = require('./validators')
-  , CURRENT_CONGRESS = require('./CURRENT_CONGRESS');
+  , {CURRENT_CONGRESS} = require('./defaults');
 
 /**
  * Creates a new object with promise-based versions of the validator functions
