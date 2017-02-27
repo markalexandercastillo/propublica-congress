@@ -89,6 +89,16 @@ const memberBillTypes = [
 
 const proto = {
   /**
+   * Resolves to biographical and Congressional role information for a particular member of Congress
+   *
+   * @param {String} memberId
+   * @returns {Promise}
+   */
+  getMember(memberId) {
+    return validate.memberId(memberId)
+      .then(() => this.api.get(`members/${memberId}`));
+  },
+  /**
    * Resolves to the members of a particular committee
    *
    * @see https://propublica.github.io/congress-api-docs/#get-committees-and-committee-memberships

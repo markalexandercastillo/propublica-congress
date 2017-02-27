@@ -790,6 +790,18 @@ describe('pro-publica-congress', () => {
           .then(() => verify(api.get(anything(), '{offset}')));
       });
     });
+
+    describe('.getMember()', () => {
+      it("performs a request to an endpoint resembling 'members/{member-id}'", () => {
+        return ppc.getMember('{member-id}')
+          .then(() => looseVerify(api.get('members/{member-id}')));
+      });
+
+      it('rejects with an invalid member ID', () => {
+        return ppc.getMember('{invalid-member-id}')
+          .should.be.rejectedWith(Error, 'Received invalid member id:');
+      });
+    });
   });
 });
 
