@@ -340,12 +340,12 @@ describe('pro-publica-congress', () => {
 
       it('rejects with an invalid first member ID', () => {
         return getMemberComparison({firstMemberId: '{invalid-member-id}'})
-          .should.be.rejectedWith(Error, 'Received invalid member id:');
+          .should.be.rejectedWith(Error, 'Received invalid first member id:');
       });
 
       it('rejects with an invalid second member ID', () => {
         return getMemberComparison({secondMemberId: '{invalid-second-member-id}'})
-          .should.be.rejectedWith(Error, 'Received invalid member id:');
+          .should.be.rejectedWith(Error, 'Received invalid second member id:');
       });
 
       it('rejects with an invalid chamber', () => {

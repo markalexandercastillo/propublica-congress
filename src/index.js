@@ -4,29 +4,27 @@ const {create, assign, keys} = Object
   , validators = require('./validators')
   , {CURRENT_CONGRESS} = require('./defaults');
 
-function validateArgs(argsMap) {
-  return new Promise((resolve, reject) => {
-    Object.keys(argsMap).some(name => {
-      const args = Array.isArray(argsMap[name]) && argsMap[name].length > 1
-        ? argsMap[name]
-        : [argsMap[name]];
+const validateArgs = argsMap => new Promise((resolve, reject) => {
+  Object.keys(argsMap).some(name => {
+    const args = Array.isArray(argsMap[name]) && argsMap[name].length > 1
+      ? argsMap[name]
+      : [argsMap[name]];
 
-      const validatorName = name.match(/(Type|MemberId)/)
-        ? `isValid${name.match(/(Type|MemberId)/)[0]}`
-        : `isValid${name[0].toUpperCase()}${name.slice(1)}`;
+    const validatorName = name.match(/(Type|MemberId)/)
+      ? `isValid${name.match(/(Type|MemberId)/)[0]}`
+      : `isValid${name[0].toUpperCase()}${name.slice(1)}`;
 
-      const descriptor = (name.match(/(MemberId)/) ? name.match(/(MemberId)/)[0] : name)
-          .replace(/[A-Z]/g, letter => ` ${letter.toLowerCase()}`)
-          .trim()
-          .replace(/id:/, letter => letter.toUpperCase());
+    const descriptor = name
+        .replace(/[A-Z]/g, letter => ` ${letter.toLowerCase()}`)
+        .trim()
+        .replace(/id:/, letter => letter.toUpperCase());
 
-      if (!validators[validatorName](...args)) {
-        return reject(new Error(`Received invalid ${descriptor}: ${stringify(args[0])}`));
-      }
-    });
-    resolve();
+    if (!validators[validatorName](...args)) {
+      return reject(new Error(`Received invalid ${descriptor}: ${stringify(args[0])}`));
+    }
   });
-}
+  resolve();
+});
 
 const recentBillTypes = [
   'introduced',
