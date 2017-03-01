@@ -5,25 +5,31 @@ const {create, assign, keys} = Object
   , {CURRENT_CONGRESS} = require('./defaults');
 
 const validateArgs = argsMap => new Promise((resolve, reject) => {
+  let error;
   Object.keys(argsMap).some(name => {
-    const args = Array.isArray(argsMap[name]) && argsMap[name].length > 1
+    // if not already an array, coerce args into array to be spread later on. assumes first arg is
+    // never actually an array
+    const args = Array.isArray(argsMap[name])
       ? argsMap[name]
       : [argsMap[name]];
 
+    // validator function name
     const validatorName = name.match(/(Type|MemberId)/)
       ? `isValid${name.match(/(Type|MemberId)/)[0]}`
       : `isValid${name[0].toUpperCase()}${name.slice(1)}`;
 
+    // for a descriptive error message
     const descriptor = name
         .replace(/[A-Z]/g, letter => ` ${letter.toLowerCase()}`)
         .trim()
         .replace(/id:/, letter => letter.toUpperCase());
 
     if (!validators[validatorName](...args)) {
-      return reject(new Error(`Received invalid ${descriptor}: ${stringify(args[0])}`));
+      return error = new Error(`Received invalid ${descriptor}: ${stringify(args[0])}`);
     }
   });
-  resolve();
+
+  error ? reject(error) : resolve();
 });
 
 const recentBillTypes = [
