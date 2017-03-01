@@ -4,49 +4,28 @@ const {create, assign, keys} = Object
   , validators = require('./validators')
   , {CURRENT_CONGRESS} = require('./defaults');
 
-/**
- * Creates a new object with promise-based versions of the validator functions
- * which take the same arguments (with the exception of the corresponding function
- * to isValidType, which takes an additional descriptor argument). These functions
- * resolve if the validator passes. They will otherwise reject with an Error
- * message composed from the name of the function or the descriptor for 'isType'
- * functions.
- *
- * eg. validators.isValidCommitteeId gets mapped to validate.committeeId which rejects
- * with an error 'Received invalid committee id: ...'
- *
- * There were previously explicit definitions for these functions.
- */
-const validate =
-  // take all function names
-  keys(validators)
-    .reduce((validate, validatorName) => {
-      let validateName = validatorName.replace('isValid', '');
-      validateName = `${validateName[0].toLowerCase()}${validateName.slice(1)}`;
-      return assign(validate, {
-        [validateName](...args) {
-          const descriptor = validateName === 'type'
-            // isValidType is meant for different scenarios so validators.type takes accepts
-            // an extra arg meant to be a more specific descriptor
-            ? args[args.length -1]
-            : validateName.replace(/[A-Z]/g, letter => ` ${letter.toLowerCase()}`).trim();
+function validateArgs(argsMap) {
+  return new Promise((resolve, reject) => {
+    Object.keys(argsMap).some(name => {
+      const args = Array.isArray(argsMap[name]) && argsMap[name].length > 1
+        ? argsMap[name]
+        : [argsMap[name]];
 
-          args = validateName === 'type'
-            // omit the last argument passed for isValidType calls which is expected to be a
-            // descriptor
-            ? args.slice(0, -1)
-            : args;
+      const validatorName = name.match(/(Type|MemberId)/)
+        ? `isValid${name.match(/(Type|MemberId)/)[0]}`
+        : `isValid${name[0].toUpperCase()}${name.slice(1)}`;
 
-          return new Promise((resolve, reject) => validators[validatorName](...args)
-            ? resolve()
-            : reject(new Error(`Received invalid ${descriptor}: ${stringify(args[0])}`))
-          );
-        }
-      });
-    }, {});
+      const descriptor = (name.match(/(MemberId)/) ? name.match(/(MemberId)/)[0] : name)
+          .replace(/[A-Z]/g, letter => ` ${letter.toLowerCase()}`)
+          .trim()
+          .replace(/id:/, letter => letter.toUpperCase());
 
-function all(...args) {
-  return Promise.all(args);
+      if (!validators[validatorName](...args)) {
+        return reject(new Error(`Received invalid ${descriptor}: ${stringify(args[0])}`));
+      }
+    });
+    resolve();
+  });
 }
 
 const recentBillTypes = [
@@ -95,7 +74,7 @@ const proto = {
    * @returns {Promise}
    */
   getMember(memberId) {
-    return validate.memberId(memberId)
+    return validateArgs({memberId})
       .then(() => this.api.get(`members/${memberId}`));
   },
   /**
@@ -108,11 +87,11 @@ const proto = {
    * @returns {Promise}
    */
   getCommitteeMembers(chamber, committeeId, {congress = this.congress, offset = 0} = {}) {
-    return all(
-      validate.chamber(chamber),
-      validate.congress(congress, 110),
-      validate.committeeId(committeeId)
-    ).then(() => this.api.get(`${congress}/${chamber}/committees/${committeeId}`, offset));
+    return validateArgs({
+      chamber,
+      committeeId,
+      congress: [congress, 110]
+    }).then(() => this.api.get(`${congress}/${chamber}/committees/${committeeId}`, offset));
   },
   /**
    * Resolves to a list of presidential civilian nominations of individuals from a specific state.
@@ -123,10 +102,10 @@ const proto = {
    * @returns {Promise}
    */
   getNomineesByState(state, {congress = this.congress} = {}) {
-    return all(
-      validate.state(state),
-      validate.congress(congress, 107)
-    ).then(() => this.api.get(`${congress}/nominees/state/${state}`));
+    return validateArgs({
+      state,
+      congress: [congress, 107]
+    }).then(() => this.api.get(`${congress}/nominees/state/${state}`));
   },
   /**
    * Resolves to all votes in a particular month.
@@ -138,11 +117,8 @@ const proto = {
    * @returns {Promise}
    */
   getVotesByDate(chamber, year, month) {
-    return all(
-      validate.chamber(chamber),
-      validate.year(year),
-      validate.month(month)
-    ).then(() => this.api.get(`${chamber}/votes/${year}/${month}`));
+    return validateArgs({chamber, year, month})
+      .then(() => this.api.get(`${chamber}/votes/${year}/${month}`));
   },
   /**
    * Resolves to a specific roll-call vote, including a complete list of member positions.
@@ -155,11 +131,12 @@ const proto = {
    * @returns {Promise}
    */
   getRollCallVotes(chamber, sessionNumber, rollCallNumber, {congress = this.congress} = {}) {
-    return all(
-      validate.rollCallNumber(rollCallNumber),
-      validate.sessionNumber(sessionNumber),
-      validate.chamber(chamber).then(() => validate.congress(congress, {house: 102, senate: 101}[chamber]))
-    ).then(() => this.api.get(`${congress}/${chamber}/sessions/${sessionNumber}/votes/${rollCallNumber}`));
+    return validateArgs({
+      rollCallNumber,
+      sessionNumber,
+      chamber,
+      congress: [congress, {house: 102, senate: 101}[chamber]]
+    }).then(() => this.api.get(`${congress}/${chamber}/sessions/${sessionNumber}/votes/${rollCallNumber}`));
   },
   /**
    * Resolves to the 20 bills most recently introduced or updated by a particular member. Results
@@ -172,10 +149,10 @@ const proto = {
    * @returns {Promise}
    */
   getBillsByMember(memberId, memberBillType, {offset = 0} = {}) {
-    return all(
-      validate.memberId(memberId),
-      validate.type(memberBillType, memberBillTypes, 'member bill type')
-    ).then(() => this.api.get(`members/${memberId}/bills/${memberBillType}`, offset));
+    return validateArgs({
+      memberId,
+      memberBillType: [memberBillType, memberBillTypes]
+    }).then(() => this.api.get(`members/${memberId}/bills/${memberBillType}`, offset));
   },
   /**
    * Resolves to the current members of the house of representatives for the given state and
@@ -187,10 +164,8 @@ const proto = {
    * @returns {Promise}
    */
   getCurrentRepresentatives(state, district) {
-    return all(
-      validate.state(state),
-      validate.district(district)
-    ).then(() => this.api.get(`members/house/${state}/${district}/current`));
+    return validateArgs({state, district})
+      .then(() => this.api.get(`members/house/${state}/${district}/current`));
   },
   /**
    * Resolves to the current members of the senate for the given state
@@ -200,7 +175,7 @@ const proto = {
    * @returns {Promise}
    */
   getCurrentSenators(state) {
-    return validate.state(state)
+    return validateArgs({state})
       .then(() => this.api.get(`members/senate/${state}/current`));
   },
   /**
@@ -213,10 +188,10 @@ const proto = {
    * @returns {Promise}
    */
   getLeavingMembers(chamber, {congress = this.congress, offset = 0} = {}) {
-    return all(
-      validate.congress(congress, 111),
-      validate.chamber(chamber)
-    ).then(() => this.api.get(`${congress}/${chamber}/members/leaving`, offset));
+    return validateArgs({
+      chamber,
+      congress: [congress, 111]
+    }).then(() => this.api.get(`${congress}/${chamber}/members/leaving`, offset));
   },
   /**
    * You can get vote information in four categories: missed votes, party votes, lone no votes and
@@ -235,10 +210,11 @@ const proto = {
    * @returns {Promise}
    */
   getVotes(chamber, voteType, {congress = this.congress, offset = 0} = {}) {
-    return all(
-      validate.type(voteType, voteTypes, 'vote type'),
-      validate.chamber(chamber).then(() => validate.congress(congress, {senate: 101, house: 102}[chamber]))
-    ).then(() => this.api.get(`${congress}/${chamber}/votes/${voteType}`, offset));
+    return validateArgs({
+      chamber,
+      voteType: [voteType, voteTypes],
+      congress: [congress, {senate: 101, house: 102}[chamber]]
+    }).then(() => this.api.get(`${congress}/${chamber}/votes/${voteType}`, offset));
   },
   /**
    * Resolves to Senate votes on presidential nominations
@@ -248,7 +224,7 @@ const proto = {
    * @returns {Promise}
    */
   getSenateNominationVotes({congress = this.congress, offset = 0} = {}) {
-    return validate.congress(congress, 101)
+    return validateArgs({congress: [congress, 101]})
       .then(() => this.api.get(`${congress}/nominations`, offset));
   },
   /**
@@ -260,10 +236,10 @@ const proto = {
    * @returns {Promise}
    */
   getNominees(nomineeType, {congress = this.congress} = {}) {
-    return all(
-      validate.congress(congress, 107),
-      validate.type(nomineeType, nomineeTypes, 'nominee type')
-    ).then(() => this.api.get(`${congress}/nominees/${nomineeType}`));
+    return validateArgs({
+      congress: [congress, 107],
+      nomineeType: [nomineeType, nomineeTypes]
+    }).then(() => this.api.get(`${congress}/nominees/${nomineeType}`));
   },
   /**
    * Resolves to party membership counts for all states (current Congress only)
@@ -283,10 +259,10 @@ const proto = {
    * @returns {Promise}
    */
   getCommittees(chamber, {congress = this.congress, offset = 0} = {}) {
-    return all(
-      validate.congress(congress, 110),
-      validate.chamber(chamber)
-    ).then(() => this.api.get(`${congress}/${chamber}/committees`, offset));
+    return validateArgs({
+      chamber,
+      congress: [congress, 110]
+    }).then(() => this.api.get(`${congress}/${chamber}/committees`, offset));
   },
   /**
    * Resolves to a comparison of bill sponsorship or vote positions between two members who served
@@ -302,12 +278,13 @@ const proto = {
    * @returns {Promise}
    */
   getMemberComparison(firstMemberId, secondMemberId, chamber, memberComparisonType, {congress = this.congress, offset = 0} = {}) {
-    return all(
-      validate.memberId(firstMemberId),
-      validate.memberId(secondMemberId),
-      validate.type(memberComparisonType, memberComparisonTypes, 'member comparison type'),
-      validate.chamber(chamber).then(() => validate.congress(congress, {senate: 101, house: 102}[chamber]))
-    ).then(() => {
+    return validateArgs({
+      chamber,
+      firstMemberId,
+      secondMemberId,
+      memberComparisonType: [memberComparisonType, memberComparisonTypes],
+      congress: [congress, {senate: 101, house: 102}[chamber]]
+    }).then(() => {
       const endpoint = `members/${firstMemberId}/${memberComparisonType}/${secondMemberId}/${congress}/${chamber}`;
       return this.api.get(endpoint, offset);
     });
@@ -322,7 +299,7 @@ const proto = {
    * @returns {Promise}
    */
   getVotesByMember(memberId, {offset = 0} = {}) {
-    return validate.memberId(memberId)
+    return validateArgs({memberId})
       .then(() => this.api.get(`members/${memberId}/votes`, offset));
   },
   /**
@@ -344,9 +321,10 @@ const proto = {
    * @returns {Promise}
    */
   getMemberList(chamber, {congress = this.congress, offset = 0} = {}) {
-    return validate.chamber(chamber)
-      .then(() => validate.congress(congress, {senate: 80, house: 102}[chamber]))
-      .then(() => this.api.get(`${congress}/${chamber}/members`, offset));
+    return validateArgs({
+      chamber,
+      congress: [congress, {senate: 80, house: 102}[chamber]]
+    }).then(() => this.api.get(`${congress}/${chamber}/members`, offset));
   },
   /**
    * Resolves to additional details about a particular bill of the given type.
@@ -359,11 +337,11 @@ const proto = {
    * @returns {Promise}
    */
   getAdditionalBillDetails(billId, additionalBillDetailType, {congress = this.congress, offset = 0} = {}) {
-    return all(
-      validate.congress(congress, 105),
-      validate.billId(billId),
-      validate.type(additionalBillDetailType, additionalBillDetailTypes, 'additional bill detail type')
-    ).then(() => this.api.get(`${congress}/bills/${billId}/${additionalBillDetailType}`, offset));
+    return validateArgs({
+      billId,
+      congress: [congress, 105],
+      additionalBillDetailType: [additionalBillDetailType, additionalBillDetailTypes]
+    }).then(() => this.api.get(`${congress}/bills/${billId}/${additionalBillDetailType}`, offset));
   },
   /**
    * Resolves to details about a particular bill, including actions taken and votes.
@@ -374,10 +352,10 @@ const proto = {
    * @returns {Promise}
    */
   getBill(billId, {congress = this.congress} = {}) {
-    return all(
-      validate.congress(congress, 105),
-      validate.billId(billId)
-    ).then(() => this.api.get(`${congress}/bills/${billId}`));
+    return validateArgs({
+      billId,
+      congress: [congress, 105]
+    }).then(() => this.api.get(`${congress}/bills/${billId}`));
   },
   /**
    * Resolves to summaries of the 20 most recent bills by type. For the current Congress,
@@ -391,11 +369,11 @@ const proto = {
    * @returns {Promise}
    */
   getRecentBills(chamber, recentBillType, {congress = this.congress, offset = 0} = {}) {
-    return all(
-      validate.chamber(chamber),
-      validate.congress(congress, 105),
-      validate.type(recentBillType, recentBillTypes, 'recent bill type')
-    ).then(() => this.api.get(`${congress}/${chamber}/bills/${recentBillType}`, offset));
+    return validateArgs({
+      chamber,
+      congress: [congress, 105],
+      recentBillType: [recentBillType, recentBillTypes]
+    }).then(() => this.api.get(`${congress}/${chamber}/bills/${recentBillType}`, offset));
   }
 };
 

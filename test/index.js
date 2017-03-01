@@ -433,7 +433,7 @@ describe('pro-publica-congress', () => {
       });
 
       it('rejects with an invalid congress', () => {
-        return ppc.getLeavingMembers('{invalid-congress}', {congress: '{invalid-congress}'})
+        return ppc.getLeavingMembers('{chamber}', {congress: '{invalid-congress}'})
           .should.be.rejectedWith(Error, 'Received invalid congress:');
       });
 
