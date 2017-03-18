@@ -70,7 +70,7 @@ function isValidApiKey(apiKey) {
  * @returns {Boolean}
  */
 function isValidBillId(billId) {
-  return /hres\d+/.test(billId);
+  return /(hres|hr|s|sres|sjres)\d+/.test(billId);
 }
 
 /**

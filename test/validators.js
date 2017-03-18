@@ -112,8 +112,12 @@ describe('validators', () => {
   });
 
   describe('isValidBillId()', () => {
-    it("accepts strings that begin with 'hr' followed by numbers", () => {
+    it("accepts strings that begin with known slugified bill formats", () => {
       validators.isValidBillId('hres123').should.be.true;
+      validators.isValidBillId('hr123').should.be.true;
+      validators.isValidBillId('s123').should.be.true;
+      validators.isValidBillId('sres123').should.be.true;
+      validators.isValidBillId('sjres123').should.be.true;
     });
 
     it("rejects anything that doesn't begin with 'hr' followed by numbers", () => {
