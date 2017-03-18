@@ -1,5 +1,5 @@
 const chai = require('chai')
-  , states = require('./../src/states')
+  , states = require('./../src/data/states')
   , validators = require('./../src/validators');
 
 chai.should();

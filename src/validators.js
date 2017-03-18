@@ -3,7 +3,7 @@
  * for minimizing unnecessary API calls so some aren't very strict
  */
 
-const states = require('./states')
+const {states, chambers} = require('./data')
   , {CURRENT_CONGRESS} = require('./defaults');
 
 /**
@@ -33,10 +33,7 @@ function isValidType(type, types = []) {
  * @return {Boolean}
  */
 function isValidChamber(chamber) {
-  return isValidType(chamber, [
-    'senate',
-    'house'
-  ]);
+  return isValidType(chamber, chambers);
 }
 
 

@@ -2,8 +2,22 @@ const {create, assign, keys} = Object
   , {stringify} = JSON
   , api = require('./api')
   , validators = require('./validators')
+  , {
+    additionalBillDetailTypes,
+    memberBillTypes,
+    memberComparisonTypes,
+    nomineeTypes,
+    recentBillTypes,
+    voteTypes
+  } = require('./data')
   , {CURRENT_CONGRESS} = require('./defaults');
 
+/**
+ * Runs validator functions on every value in argsMap
+ *
+ * @param {Object} argsMap
+ * @returns {Promise}
+ */
 const validateArgs = argsMap => new Promise((resolve, reject) => {
   let error;
   Object.keys(argsMap).some(name => {
@@ -20,10 +34,11 @@ const validateArgs = argsMap => new Promise((resolve, reject) => {
 
     // for a descriptive error message
     const descriptor = name
-        .replace(/[A-Z]/g, letter => ` ${letter.toLowerCase()}`)
-        .trim()
-        .replace(/id:/, letter => letter.toUpperCase());
+      .replace(/[A-Z]/g, letter => ` ${letter.toLowerCase()}`)
+      .trim()
+      .replace(/id:/, letter => letter.toUpperCase());
 
+    // run validation function
     if (!validators[validatorName](...args)) {
       return error = new Error(`Received invalid ${descriptor}: ${stringify(args[0])}`);
     }
@@ -31,44 +46,6 @@ const validateArgs = argsMap => new Promise((resolve, reject) => {
 
   error ? reject(error) : resolve();
 });
-
-const recentBillTypes = [
-  'introduced',
-  'updated',
-  'passed',
-  'major'
-];
-
-const additionalBillDetailTypes = [
-  'subjects',
-  'amendments',
-  'related',
-  'cosponsors'
-];
-
-const memberComparisonTypes = [
-  'bills',
-  'votes'
-];
-
-const nomineeTypes = [
-  'received',
-  'updated',
-  'confirmed',
-  'withdrawn'
-];
-
-const voteTypes = [
-  'missed',
-  'party',
-  'loneno',
-  'perfect'
-];
-
-const memberBillTypes = [
-  'introduced',
-  'updated'
-];
 
 const proto = {
   /**
