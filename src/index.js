@@ -2,14 +2,7 @@ const {create, assign, keys} = Object
   , {stringify} = JSON
   , api = require('./api')
   , validators = require('./validators')
-  , {
-    additionalBillDetailTypes,
-    memberBillTypes,
-    memberComparisonTypes,
-    nomineeTypes,
-    recentBillTypes,
-    voteTypes
-  } = require('./data')
+  , data = require('./data')
   , {CURRENT_CONGRESS} = require('./defaults');
 
 /**
@@ -47,7 +40,7 @@ const validateArgs = argsMap => new Promise((resolve, reject) => {
   error ? reject(error) : resolve();
 });
 
-const proto = {
+const proto = assign({}, data, {
   /**
    * Resolves to biographical and Congressional role information for a particular member of Congress
    *
@@ -132,7 +125,7 @@ const proto = {
   getBillsByMember(memberId, memberBillType, {offset = 0} = {}) {
     return validateArgs({
       memberId,
-      memberBillType: [memberBillType, memberBillTypes]
+      memberBillType: [memberBillType, data.memberBillTypes]
     }).then(() => this.api.get(`members/${memberId}/bills/${memberBillType}`, offset));
   },
   /**
@@ -193,7 +186,7 @@ const proto = {
   getVotes(chamber, voteType, {congress = this.congress, offset = 0} = {}) {
     return validateArgs({
       chamber,
-      voteType: [voteType, voteTypes],
+      voteType: [voteType, data.voteTypes],
       congress: [congress, {senate: 101, house: 102}[chamber]]
     }).then(() => this.api.get(`${congress}/${chamber}/votes/${voteType}`, offset));
   },
@@ -219,7 +212,7 @@ const proto = {
   getNominees(nomineeType, {congress = this.congress} = {}) {
     return validateArgs({
       congress: [congress, 107],
-      nomineeType: [nomineeType, nomineeTypes]
+      nomineeType: [nomineeType, data.nomineeTypes]
     }).then(() => this.api.get(`${congress}/nominees/${nomineeType}`));
   },
   /**
@@ -263,7 +256,7 @@ const proto = {
       chamber,
       firstMemberId,
       secondMemberId,
-      memberComparisonType: [memberComparisonType, memberComparisonTypes],
+      memberComparisonType: [memberComparisonType, data.memberComparisonTypes],
       congress: [congress, {senate: 101, house: 102}[chamber]]
     }).then(() => {
       const endpoint = `members/${firstMemberId}/${memberComparisonType}/${secondMemberId}/${congress}/${chamber}`;
@@ -321,7 +314,7 @@ const proto = {
     return validateArgs({
       billId,
       congress: [congress, 105],
-      additionalBillDetailType: [additionalBillDetailType, additionalBillDetailTypes]
+      additionalBillDetailType: [additionalBillDetailType, data.additionalBillDetailTypes]
     }).then(() => this.api.get(`${congress}/bills/${billId}/${additionalBillDetailType}`, offset));
   },
   /**
@@ -353,10 +346,10 @@ const proto = {
     return validateArgs({
       chamber,
       congress: [congress, 105],
-      recentBillType: [recentBillType, recentBillTypes]
+      recentBillType: [recentBillType, data.recentBillTypes]
     }).then(() => this.api.get(`${congress}/${chamber}/bills/${recentBillType}`, offset));
   }
-};
+});
 
 module.exports = {
   /**

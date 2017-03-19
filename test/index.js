@@ -2,6 +2,7 @@ const {replace, when, verify, object, matchers: {
   anything,
   argThat
 }} = require('testdouble')
+  , data = require('./../src/data')
   , {CURRENT_CONGRESS} = require('./../src/defaults');
 
 require('chai').use(require('chai-as-promised')).should();
@@ -802,6 +803,17 @@ describe('pro-publica-congress', () => {
           .should.be.rejectedWith(Error, 'Received invalid member id:');
       });
     });
+  });
+
+  describe('exposed data', () => {
+    let ppc;
+    beforeEach(() => {
+      when(apiModule.create(anything())).thenReturn({});
+      ppc = createPpc('PROPUBLICA_API_KEY', '{congress}');
+    });
+    Object.keys(data).forEach(expectedKey => it(`exposes ${expectedKey}`, () => {
+      ppc[expectedKey].should.equal(data[expectedKey]);
+    }));
   });
 });
 
