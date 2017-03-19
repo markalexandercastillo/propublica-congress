@@ -20,7 +20,7 @@ const {create, assign, keys} = Object
  */
 const validateArgs = argsMap => new Promise((resolve, reject) => {
   let error;
-  Object.keys(argsMap).some(name => {
+  keys(argsMap).some(name => {
     // if not already an array, coerce args into array to be spread later on. assumes first arg is
     // never actually an array
     const args = Array.isArray(argsMap[name])
