@@ -71,7 +71,7 @@ describe('api', () => {
       return api.get('some/endpoint', 20)
         .then(() => verify(http.get(
           anything(),
-          contains({body: {offset: 20}})
+          contains({query: {offset: 20}})
         )));
     });
 

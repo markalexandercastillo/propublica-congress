@@ -4,10 +4,10 @@
 
 const got = require('got');
 
-function get(url, {headers = {}, body = {}, json = false} = {}) {
+function get(url, {headers = {}, query = {}, json = false} = {}) {
   return got.get(url, {
     headers,
-    body,
+    query,
     json
   });
 }

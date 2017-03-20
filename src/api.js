@@ -22,10 +22,10 @@ const proto = {
     }
 
     const headers = {['X-API-Key']: this.key};
-    const body = offset ? {offset} : {};
+    const query = offset ? {offset} : {};
     return http.get(
       `${API_HOST}/congress/v${API_VERSION}/${endpoint}.json`,
-      assign({headers, json: true}, {body})
+      assign({headers, json: true}, {query})
     ).then(({body}) => body);
   }
 };
