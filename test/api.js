@@ -1,8 +1,8 @@
 const {replace, when, verify, matchers: {
-  anything,
-  contains,
-  argThat
-}} = require('testdouble')
+    anything,
+    contains,
+    argThat
+  }} = require('testdouble')
   , URL = require('url')
   , {API_VERSION, API_HOST} = require('./../src/defaults');
 
