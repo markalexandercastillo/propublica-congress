@@ -1,7 +1,7 @@
 const {replace, when, verify, object, matchers: {
-  anything,
-  argThat
-}} = require('testdouble')
+    anything,
+    argThat
+  }} = require('testdouble')
   , data = require('./../src/data')
   , {CURRENT_CONGRESS} = require('./../src/defaults');
 
