@@ -1,6 +1,7 @@
 const chai = require('chai')
   , states = require('./../src/data/states')
-  , validators = require('./../src/validators');
+  , validators = require('./../src/validators')
+  , {CURRENT_CONGRESS} = require('./../src/defaults');
 
 chai.should();
 
@@ -78,12 +79,12 @@ describe('validators', () => {
   describe('isValidCongress()', () => {
     context('without a lower limit', () => {
       it('accepts the current session and lower', () => {
-        validators.isValidCongress(115).should.be.true;
+        validators.isValidCongress(CURRENT_CONGRESS).should.be.true;
         validators.isValidCongress(100).should.be.true;
       });
 
       it('rejects any sessions past the current congress', () => {
-        validators.isValidCongress(116).should.be.false;
+        validators.isValidCongress(CURRENT_CONGRESS + 1).should.be.false;
         validators.isValidCongress(200).should.be.false;
       });
 
@@ -97,7 +98,7 @@ describe('validators', () => {
 
     context('with a lower limit', () => {
       it('rejects any sessions past the current congress', () => {
-        validators.isValidCongress(116, 108).should.be.false;
+        validators.isValidCongress(CURRENT_CONGRESS + 1, 108).should.be.false;
         validators.isValidCongress(200, 108).should.be.false;
       });
 
