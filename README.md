@@ -18,7 +18,8 @@ yarn add propublica-congress
 ## Usage
 
 ```javascript
-const ppc = require('propublica-congress').create('PROPUBLICA_API_KEY');
+const congress = 116;
+const ppc = require('propublica-congress').create('PROPUBLICA_API_KEY', congress);
 
 ppc.getCurrentSenators('NY')
   .then(results => console.log(results));
